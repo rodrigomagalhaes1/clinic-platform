@@ -1,42 +1,42 @@
-# Plataforma Modular para Clinica Medica
+# Plataforma Modular para Clínica Médica
 
-Software de gestao e automacao para clinicas medicas, com foco em agentes, faturamento, financeiro, atendimento e operacao.
+Software de gestão e automação para clínicas médicas, com foco em agentes, faturamento, financeiro, atendimento e operação.
 
 ## Objetivo
 
-Criar uma plataforma modular que permita evoluir por partes, mantendo regras de negocio isoladas, auditoria completa e automacoes seguras para tarefas operacionais da clinica.
+Criar uma plataforma modular que permita evoluir por partes, mantendo regras de negócio isoladas, auditoria completa e automações seguras para tarefas operacionais da clínica.
 
-## Modulos iniciais
+## Módulos iniciais
 
-- Pacientes e prontuario administrativo
+- Pacientes e prontuário administrativo
 - Agenda, check-in e atendimento
-- Faturamento medico e repasses
+- Faturamento médico e repasses
 - Financeiro, contas a pagar/receber e fluxo de caixa
-- Automacao com agentes
-- Relatorios gerenciais
-- Usuarios, permissoes, auditoria e LGPD
+- Automação com agentes
+- Relatórios gerenciais
+- Usuários, permissões, auditoria e LGPD
 
 ## Estrutura
 
 ```text
 apps/
   api/        API principal
-  web/        Interface da aplicacao
+  web/        Interface da aplicação
 data/
   clinic.sqlite  Banco local SQLite criado automaticamente
 packages/
   domain/     Entidades, contratos e regras centrais
-  agents/     Orquestracao de agentes e automacoes
-  shared/     Tipos e utilitarios compartilhados
+  agents/     Orquestração de agentes e automações
+  shared/     Tipos e utilitários compartilhados
 docs/
   architecture.md
   modules.md
   roadmap.md
 ```
 
-## Rodando a aplicacao recuperada
+## Rodando a aplicação recuperada
 
-Para subir a aplicacao completa em uma unica porta:
+Para subir a aplicação completa em uma única porta:
 
 ```powershell
 .\run-clinic.cmd
@@ -48,7 +48,7 @@ Depois abra:
 http://localhost:5173
 ```
 
-Neste modo, a interface e a API rodam juntas. O lancador fica em `apps/clinic-server-runtime.mjs`, e o runtime recuperado fica em `apps/api/src/clinic-server-runtime.mjs`. Os endpoints ficam na mesma origem:
+Neste modo, a interface e a API rodam juntas. O lançador fica em `apps/clinic-server-runtime.mjs`, e o runtime recuperado fica em `apps/api/src/clinic-server-runtime.mjs`. Os endpoints ficam na mesma origem:
 
 ```text
 http://localhost:5173/v1
@@ -57,13 +57,13 @@ http://localhost:5173/health
 
 ## Rodando em modo servidor
 
-Use o script de producao local:
+Use o script de produção local:
 
 ```powershell
 .\run-production.cmd
 ```
 
-Variaveis principais:
+Variáveis principais:
 
 ```text
 APP_ENV=production
@@ -75,7 +75,7 @@ CLINIC_BACKUPS_PATH=data/backups
 
 Checklist detalhado: [docs/deployment.md](docs/deployment.md).
 
-O banco local e criado automaticamente em:
+O banco local é criado automaticamente em:
 
 ```text
 C:\Users\Rodrigo\Documents\New project\data\clinic.sqlite
@@ -83,7 +83,7 @@ C:\Users\Rodrigo\Documents\New project\data\clinic.sqlite
 
 ## Alternativa antiga: API e interface separadas
 
-Esta alternativa existe para compatibilidade, mas nao representa toda a aplicacao recuperada. Para usar todos os modulos atuais, prefira `.\run-clinic.cmd`.
+Esta alternativa existe para compatibilidade, mas não representa toda a aplicação recuperada. Para usar todos os módulos atuais, prefira `.\run-clinic.cmd`.
 
 ```powershell
 .\run-dev.cmd
@@ -107,7 +107,7 @@ Ou:
 .\run-api.ps1
 ```
 
-Enquanto o gerenciador de pacotes nao estiver configurado no ambiente, a API tambem pode ser iniciada diretamente com Node:
+Enquanto o gerenciador de pacotes não estiver configurado no ambiente, a API também pode ser iniciada diretamente com Node:
 
 ```powershell
 node apps\api\src\main.ts
@@ -148,7 +148,7 @@ Depois abra:
 http://localhost:5173
 ```
 
-Tambem e possivel abrir o HTML diretamente no navegador:
+Também é possível abrir o HTML diretamente no navegador:
 
 ```text
 apps\web\index.html
@@ -160,10 +160,10 @@ Ou use o caminho completo:
 C:\Users\Rodrigo\Documents\New project\apps\web\index.html
 ```
 
-## Principios
+## Princípios
 
-- Modularidade por dominio, nao por camada tecnica.
-- Auditoria em toda acao critica.
-- Automacoes com aprovacao humana quando houver risco financeiro, legal ou clinico.
-- Dados sensiveis tratados com seguranca e rastreabilidade.
-- Integracoes externas isoladas por adaptadores.
+- Modularidade por domínio, não por camada técnica.
+- Auditoria em toda ação crítica.
+- Automações com aprovação humana quando houver risco financeiro, legal ou clínico.
+- Dados sensíveis tratados com segurança e rastreabilidade.
+- Integrações externas isoladas por adaptadores.

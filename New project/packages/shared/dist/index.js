@@ -61,6 +61,20 @@ export function toCurrencyFromCents(amountCents, locale = "pt-BR", currency = "B
     }).format(amountCents / 100);
 }
 /**
+ * Retorna a string se for não-vazia, ou `undefined` caso contrário.
+ * Útil para mapear campos opcionais de request bodies onde a ausência
+ * do valor deve ser representada como `undefined` (não como string vazia).
+ *
+ * @example optionalString("hello")     // "hello"
+ * @example optionalString("")          // undefined
+ * @example optionalString(null)        // undefined
+ * @example optionalString(undefined)   // undefined
+ * @example optionalString(42)          // undefined (only strings accepted)
+ */
+export function optionalString(value) {
+    return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+/**
  * Normaliza uma string para comparações case-insensitive sem acento.
  * Remove diacríticos (NFD) e converte para minúsculas.
  *

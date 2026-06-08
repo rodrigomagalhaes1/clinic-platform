@@ -1,4 +1,4 @@
-import { normalize, toCurrencyFromCents, formatDate, escapeHtml } from "@clinic/shared";
+import { normalize, toCurrencyFromCents, formatDate, escapeHtml, parseList } from "@clinic/shared";
 
 const API_BASE_URL = window.location.origin;
 const tokenKey = "clinic.session.token";
@@ -3250,10 +3250,10 @@ function renderSecurityPermissions() {
       </div>
       <div class="meta-row"><span>${escapeHtml(group.description ?? "Sem descricao")}</span></div>
       <div class="meta-row">
-        <span>Modulos: ${escapeHtml(csv(group.modules).join(", ") || "sem modulos")}</span>
+        <span>Modulos: ${escapeHtml(parseList(group.modules).join(", ") || "sem modulos")}</span>
       </div>
       <div class="meta-row">
-        ${csv(group.permissions).map((permission) => `<span class="badge">${escapeHtml(permissionLabel(permission))}</span>`).join("") || "<span>Sem permissoes operacionais</span>"}
+        ${parseList(group.permissions).map((permission) => `<span class="badge">${escapeHtml(permissionLabel(permission))}</span>`).join("") || "<span>Sem permissoes operacionais</span>"}
       </div>
     </article>
   `);
@@ -3789,8 +3789,8 @@ function renderUserPermissionGrid() {
 function applyUserGroupDefaults() {
   const group = registryRows("user-groups").find((row) => row.name === els.userGroupSelect.value);
   if (!group) return;
-  els.userForm.elements.modules.value = csv(group.modules).join(",");
-  const permissions = new Set(csv(group.permissions));
+  els.userForm.elements.modules.value = parseList(group.modules).join(",");
+  const permissions = new Set(parseList(group.permissions));
   els.userPermissionGrid.querySelectorAll("[data-user-permission]").forEach((input) => {
     input.checked = permissions.has(input.value);
   });
@@ -5548,10 +5548,7 @@ function sortTotemTicketsClient(a, b) {
 
 // formatDate importada de @clinic/shared — ver packages/shared/src/index.ts
 
-function csv(value) {
-  if (Array.isArray(value)) return value.map(String).filter(Boolean);
-  return String(value ?? "").split(",").map((item) => item.trim()).filter(Boolean);
-}
+// parseList importada de @clinic/shared — ver packages/shared/src/index.ts
 
 // normalize() importada de @clinic/shared \u2014 ver packages/shared/src/index.ts
 

@@ -28,6 +28,22 @@ export function escapeHtml(value) {
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
 }
+/**
+ * Converte um valor para array de strings não-vazias.
+ * Aceita arrays (retorna cópia filtrada) ou strings separadas por vírgula.
+ * Retorna [] para null, undefined ou string vazia.
+ *
+ * @example parseList("admin,manager, billing") // ["admin", "manager", "billing"]
+ * @example parseList(["a", "", "b"])            // ["a", "b"]
+ * @example parseList(null)                      // []
+ */
+export function parseList(value) {
+    if (Array.isArray(value))
+        return value.map(String).filter(Boolean);
+    if (!value)
+        return [];
+    return String(value).split(",").map((item) => item.trim()).filter(Boolean);
+}
 export function toCurrencyFromCents(amountCents, locale = "pt-BR", currency = "BRL") {
     return new Intl.NumberFormat(locale, {
         style: "currency",

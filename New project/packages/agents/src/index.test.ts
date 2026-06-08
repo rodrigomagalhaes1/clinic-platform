@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { initialAgents } from "./index.ts";
-import type { AgentDefinition, AgentRiskLevel } from "./index.ts";
+import { initialAgents } from "./index.js";
+import type { AgentDefinition, AgentRiskLevel } from "./index.js";
 
 describe("initialAgents", () => {
   it("exports a non-empty array", () => {

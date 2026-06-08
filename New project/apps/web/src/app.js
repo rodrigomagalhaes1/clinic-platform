@@ -1,4 +1,4 @@
-import { normalize } from "@clinic/shared";
+import { normalize, toCurrencyFromCents } from "@clinic/shared";
 
 const API_BASE_URL = window.location.origin;
 const tokenKey = "clinic.session.token";
@@ -578,7 +578,7 @@ const els = {
   accessDeniedSummary: document.querySelector("#accessDeniedSummary")
 };
 
-const currency = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+// toCurrencyFromCents importada de @clinic/shared — ver packages/shared/src/index.ts
 const dateTime = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" });
 
 initializeSidebar();
@@ -1484,7 +1484,7 @@ function renderDashboard() {
     summaryCard("Atendimentos", state.appointments.length),
     summaryCard("Worklist", state.worklist.length),
     summaryCard("Faturas", state.invoices.length),
-    summaryCard("Saldo previsto", currency.format((totalReceivable - totalPayable) / 100))
+    summaryCard("Saldo previsto", toCurrencyFromCents(totalReceivable - totalPayable))
   ].join("");
   els.appointmentCount.textContent = `${state.appointments.length} atendimento(s)`;
   renderList(els.dashboardAppointments, state.appointments.slice(0, 8), appointmentItem);
@@ -1968,8 +1968,8 @@ function appointmentFinanceTab(appointment) {
       <button type="submit">Salvar financeiro</button>
     </form>
     <div class="split">
-      <div class="panel"><div class="panel-heading"><h2>Faturas</h2></div>${simpleRows(invoices, (item) => `${currency.format(Number(item.totalAmountCents ?? 0) / 100)} - ${item.status ?? "aberta"}`)}</div>
-      <div class="panel"><div class="panel-heading"><h2>Movimentos</h2></div>${simpleRows(entries, (item) => `${item.description ?? "Movimento"} - ${currency.format(Number(item.amountCents ?? 0) / 100)}`)}</div>
+      <div class="panel"><div class="panel-heading"><h2>Faturas</h2></div>${simpleRows(invoices, (item) => `${toCurrencyFromCents(item.totalAmountCents ?? 0)} - ${item.status ?? "aberta"}`)}</div>
+      <div class="panel"><div class="panel-heading"><h2>Movimentos</h2></div>${simpleRows(entries, (item) => `${item.description ?? "Movimento"} - ${toCurrencyFromCents(item.amountCents ?? 0)}`)}</div>
     </div>
   `;
 }
@@ -2199,10 +2199,10 @@ function renderLaboratory() {
 function renderBilling() {
   const subview = routeMap[state.activeRoute]?.subview;
   const allRows = {
-    invoices: state.invoices.map((invoice) => ({ kind: "Fatura", title: currency.format(Number(invoice.totalAmountCents ?? 0) / 100), meta: [invoice.status, invoice.payerType, patientName(invoice.patientId)] })),
-    batches: state.billingBatches.map((batch) => ({ kind: "Lote", title: batch.title, meta: [batch.status, currency.format(Number(batch.totalAmountCents ?? 0) / 100), `${batch.invoiceCount ?? 0} fatura(s)`] })),
-    denials: state.billingDenials.map((denial) => ({ kind: "Glosa", title: denial.reason, meta: [denial.status, currency.format(Number(denial.deniedAmountCents ?? 0) / 100)] })),
-    payouts: state.doctorPayouts.map((payout) => ({ kind: "Repasse", title: payout.doctorName, meta: [payout.period, currency.format(Number(payout.payoutAmountCents ?? 0) / 100)] }))
+    invoices: state.invoices.map((invoice) => ({ kind: "Fatura", title: toCurrencyFromCents(invoice.totalAmountCents ?? 0), meta: [invoice.status, invoice.payerType, patientName(invoice.patientId)] })),
+    batches: state.billingBatches.map((batch) => ({ kind: "Lote", title: batch.title, meta: [batch.status, toCurrencyFromCents(batch.totalAmountCents ?? 0), `${batch.invoiceCount ?? 0} fatura(s)`] })),
+    denials: state.billingDenials.map((denial) => ({ kind: "Glosa", title: denial.reason, meta: [denial.status, toCurrencyFromCents(denial.deniedAmountCents ?? 0)] })),
+    payouts: state.doctorPayouts.map((payout) => ({ kind: "Repasse", title: payout.doctorName, meta: [payout.period, toCurrencyFromCents(payout.payoutAmountCents ?? 0)] }))
   };
   const rows = subview && allRows[subview]
     ? allRows[subview]
@@ -2226,9 +2226,9 @@ function renderFinance() {
   const pendingReconciliation = state.finance.filter((entry) => (entry.reconciliationStatus ?? "pending") !== "reconciled").length;
 
   els.financeSummary.innerHTML = [
-    summaryCard("A receber aberto", currency.format(openReceivables / 100)),
-    summaryCard("A pagar aberto", currency.format(openPayables / 100)),
-    summaryCard("Saldo previsto", currency.format((openReceivables - openPayables) / 100)),
+    summaryCard("A receber aberto", toCurrencyFromCents(openReceivables)),
+    summaryCard("A pagar aberto", toCurrencyFromCents(openPayables)),
+    summaryCard("Saldo previsto", toCurrencyFromCents(openReceivables - openPayables)),
     summaryCard("Conciliados", reconciled),
     summaryCard("Pendentes conciliação", pendingReconciliation)
   ].join("");
@@ -3177,7 +3177,7 @@ function financeEntryItem(entry) {
       <strong>${escapeHtml(entry.description)}</strong>
       <div class="meta-row">
         <span class="badge">${financeDirectionLabel(entry.direction)}</span>
-        <span>${currency.format(Number(entry.amountCents ?? 0) / 100)}</span>
+        <span>${toCurrencyFromCents(entry.amountCents ?? 0)}</span>
         <span>${escapeHtml(financeStatusLabel(entry.status ?? "open"))}</span>
         <span>${escapeHtml(reconciliationLabel(entry.reconciliationStatus ?? "pending"))}</span>
         ${entry.dueDate ? `<span>Venc. ${escapeHtml(entry.dueDate)}</span>` : ""}

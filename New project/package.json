@@ -2,6 +2,7 @@
   "name": "clinic-automation-platform",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Plataforma modular para clinicas medicas com automacao por agentes, faturamento e financeiro.",
   "workspaces": [
     "apps/*",
@@ -10,7 +11,13 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "test": "npm run test --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces"
+    "typecheck": "npm run typecheck --workspaces",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0"
   },
   "engines": {
     "node": ">=22"

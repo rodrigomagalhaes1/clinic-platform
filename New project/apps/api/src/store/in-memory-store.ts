@@ -19,6 +19,7 @@ function createCollection<T extends { id: string }>() {
 
 export function createInMemoryStore() {
   return {
+    databasePath: ":memory:",
     patients: createCollection<Patient>(),
     appointments: createCollection<Appointment>(),
     invoices: createCollection<MedicalInvoice>(),

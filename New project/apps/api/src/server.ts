@@ -2,11 +2,13 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { initialAgents } from "@clinic/agents";
 import { modules } from "./modules/index.ts";
 import { createSqliteStore } from "./store/sqlite-store.ts";
+import { createInMemoryStore } from "./store/in-memory-store.ts";
 import { badRequest, created, json, noContent, notFound, parseJsonBody } from "./support/http.ts";
 import { createId } from "./support/id.ts";
 
-export function createApp() {
-  const store = createSqliteStore();
+export type AppStore = ReturnType<typeof createInMemoryStore>;
+
+export function createApp(store: AppStore = createSqliteStore()) {
 
   async function handle(request: IncomingMessage, response: ServerResponse) {
     const url = new URL(request.url ?? "/", "http://localhost");

@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { initialAgents } from "../../../packages/agents/src/index.ts";
+import { initialAgents } from "@clinic/agents";
 import { modules } from "./modules/index.ts";
 import { createSqliteStore } from "./store/sqlite-store.ts";
 import { badRequest, created, json, noContent, notFound, parseJsonBody } from "./support/http.ts";
@@ -69,7 +69,7 @@ export function createApp() {
 
       const appointmentStatusMatch = url.pathname.match(/^\/v1\/appointments\/([^/]+)\/status$/);
       if (method === "PATCH" && appointmentStatusMatch) {
-        const appointment = store.appointments.get(appointmentStatusMatch[1]);
+        const appointment = store.appointments.get(appointmentStatusMatch[1] ?? "");
 
         if (!appointment) {
           return json(response, 404, {
@@ -196,7 +196,7 @@ export function createApp() {
 
       const financeReconciliationMatch = url.pathname.match(/^\/v1\/finance\/entries\/([^/]+)\/reconciliation$/);
       if (method === "PATCH" && financeReconciliationMatch) {
-        const entry = store.financialEntries.get(financeReconciliationMatch[1]);
+        const entry = store.financialEntries.get(financeReconciliationMatch[1] ?? "");
         if (!entry) {
           return notFound(response);
         }

@@ -1,4 +1,4 @@
-import type { Appointment, FinancialEntry, MedicalInvoice, Patient } from "../../../../packages/domain/src/index.ts";
+import type { Appointment, FinancialEntry, MedicalInvoice, Patient } from "@clinic/domain";
 
 function createCollection<T extends { id: string }>() {
   const rows = new Map<string, T>();

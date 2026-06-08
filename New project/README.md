@@ -6,158 +6,98 @@ Software de gestão e automação para clínicas médicas, com foco em agentes, 
 
 Criar uma plataforma modular que permita evoluir por partes, mantendo regras de negócio isoladas, auditoria completa e automações seguras para tarefas operacionais da clínica.
 
-## Módulos iniciais
+## Módulos
 
 - Pacientes e prontuário administrativo
 - Agenda, check-in e atendimento
 - Faturamento médico e repasses
 - Financeiro, contas a pagar/receber e fluxo de caixa
 - Automação com agentes
-- Relatórios gerenciais
+- Relacionamento (WhatsApp, URA/Asterisk)
 - Usuários, permissões, auditoria e LGPD
 
 ## Estrutura
 
 ```text
 apps/
-  api/        API principal
-  web/        Interface da aplicação
-data/
-  clinic.sqlite  Banco local SQLite criado automaticamente
+  api/                   API principal (Node.js ESM)
+  web/                   Interface web (Vite + JS vanilla)
+  clinic-server-runtime.mjs   Servidor full-stack (API + web, porta única)
 packages/
-  domain/     Entidades, contratos e regras centrais
-  agents/     Orquestração de agentes e automações
-  shared/     Tipos e utilitários compartilhados
-docs/
-  architecture.md
-  modules.md
-  roadmap.md
+  shared/    Utilitários compartilhados (normalize, escapeHtml, formatDate…)
+  agents/    Definições e políticas de agentes de automação
+  domain/    Tipos e entidades de domínio (TypeScript)
+data/
+  clinic.sqlite  Banco SQLite criado automaticamente na primeira execução
 ```
 
-## Rodando a aplicação recuperada
+## Rodando localmente
 
-Para subir a aplicação completa em uma única porta:
+### Modo recomendado — Full Stack (API + web na mesma porta)
 
 ```powershell
-.\run-clinic.cmd
+node apps\clinic-server-runtime.mjs
 ```
 
-Depois abra:
+Acesse em: **http://localhost:5173**
 
-```text
-http://localhost:5173
-```
+Credenciais padrão: `admin@clinic.local` / `admin123`
 
-Neste modo, a interface e a API rodam juntas. O lançador fica em `apps/clinic-server-runtime.mjs`, e o runtime recuperado fica em `apps/api/src/clinic-server-runtime.mjs`. Os endpoints ficam na mesma origem:
+### Modo dev — Vite com HMR
 
-```text
-http://localhost:5173/v1
-http://localhost:5173/health
-```
-
-## Rodando em modo servidor
-
-Use o script de produção local:
+Para desenvolvimento com hot-reload e resolução TypeScript dos workspace packages:
 
 ```powershell
-.\run-production.cmd
+# Terminal 1 — servidor de API
+node apps\clinic-server-runtime.mjs
+
+# Terminal 2 — Vite dev server
+npx vite apps/web --config apps/web/vite.config.js --port 5174
 ```
 
-Variáveis principais:
+Acesse em: **http://localhost:5174**
+
+O Vite proxia `/v1` e `/health` para o servidor na porta 5173.
+
+### Via .claude/launch.json (Claude Code)
+
+As configurações de todos os servidores estão em `.claude/launch.json` e podem ser iniciadas pelo `preview_start` do Claude Code.
+
+## Testes
+
+```powershell
+# Todos os workspaces
+npm test
+
+# Apenas @clinic/shared
+node node_modules/vitest/vitest.mjs run --root packages/shared
+```
+
+**58 testes** cobrindo as funções utilitárias de `@clinic/shared`.
+
+## CI
+
+GitHub Actions roda automaticamente em cada push e PR:
+
+- **test** — `npm test` (vitest)
+- **typecheck** — `npm run typecheck`
+
+## Pacotes workspace
+
+| Pacote | Descrição | Consumido por |
+|---|---|---|
+| `@clinic/shared` | normalize, escapeHtml, formatDate, toCurrencyFromCents, parseList, toLocalDateTime | web + api |
+| `@clinic/agents` | Definições de agentes e políticas de ferramentas | api |
+| `@clinic/domain` | Tipos TypeScript de domínio (Patient, Appointment…) | — |
+
+## Variáveis de ambiente
 
 ```text
-APP_ENV=production
 PORT=5173
-PUBLIC_BASE_URL=https://sistema.sua-clinica.com.br
+APP_ENV=production
 CLINIC_DATABASE_PATH=data/clinic.sqlite
 CLINIC_BACKUPS_PATH=data/backups
-```
-
-Checklist detalhado: [docs/deployment.md](docs/deployment.md).
-
-O banco local é criado automaticamente em:
-
-```text
-C:\Users\Rodrigo\Documents\New project\data\clinic.sqlite
-```
-
-## Alternativa antiga: API e interface separadas
-
-Esta alternativa existe para compatibilidade, mas não representa toda a aplicação recuperada. Para usar todos os módulos atuais, prefira `.\run-clinic.cmd`.
-
-```powershell
-.\run-dev.cmd
-```
-
-Depois abra:
-
-```text
-http://localhost:5173
-```
-
-No Windows, use o script:
-
-```powershell
-.\run-api.cmd
-```
-
-Ou:
-
-```powershell
-.\run-api.ps1
-```
-
-Enquanto o gerenciador de pacotes não estiver configurado no ambiente, a API também pode ser iniciada diretamente com Node:
-
-```powershell
-node apps\api\src\main.ts
-```
-
-URL local:
-
-```text
-http://localhost:3333
-```
-
-Endpoints iniciais:
-
-- `GET /health`
-- `GET /v1`
-- `GET /v1/modules`
-- `GET /v1/patients`
-- `POST /v1/patients`
-- `GET /v1/appointments`
-- `POST /v1/appointments`
-- `GET /v1/billing/invoices`
-- `POST /v1/billing/invoices`
-- `GET /v1/finance/entries`
-- `POST /v1/finance/entries`
-- `GET /v1/agents`
-
-## Abrindo a interface web
-
-Com a API rodando, inicie a interface web:
-
-```powershell
-.\run-web.cmd
-```
-
-Depois abra:
-
-```text
-http://localhost:5173
-```
-
-Também é possível abrir o HTML diretamente no navegador:
-
-```text
-apps\web\index.html
-```
-
-Ou use o caminho completo:
-
-```text
-C:\Users\Rodrigo\Documents\New project\apps\web\index.html
+PUBLIC_BASE_URL=https://sistema.sua-clinica.com.br
 ```
 
 ## Princípios

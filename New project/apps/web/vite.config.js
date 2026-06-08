@@ -16,5 +16,11 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // Proxies API calls to the Clinic Full Stack server (clinic-server-runtime.mjs)
+    // which exposes all routes including /v1/auth/login, /health, etc.
+    proxy: {
+      "/v1": { target: "http://localhost:5173", changeOrigin: true },
+      "/health": { target: "http://localhost:5173", changeOrigin: true },
+    },
   },
 });

@@ -1,3 +1,19 @@
+const _dateTime = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" });
+
+/**
+ * Formata uma data/string de data para exibição em pt-BR.
+ * Retorna "Sem data" para valores falsy e preserva o valor original
+ * caso não seja uma data válida.
+ *
+ * @example formatDate("2026-06-08T17:00:00Z") // "08/06/2026 14:00"
+ * @example formatDate(null) // "Sem data"
+ */
+export function formatDate(value: string | Date | null | undefined): string {
+  if (!value) return "Sem data";
+  const date = new Date(value as string);
+  return Number.isNaN(date.getTime()) ? String(value) : _dateTime.format(date);
+}
+
 export type Result<T, E = Error> =
   | { ok: true; value: T }
   | { ok: false; error: E };

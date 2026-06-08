@@ -14,6 +14,22 @@ export function formatDate(value: string | Date | null | undefined): string {
   return Number.isNaN(date.getTime()) ? String(value) : _dateTime.format(date);
 }
 
+/**
+ * Escapa caracteres especiais HTML para prevenir XSS em templates de string.
+ * Converte &, <, >, " e ' para suas entidades HTML equivalentes.
+ *
+ * @example escapeHtml('<script>alert("xss")</script>') // '&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;'
+ * @example escapeHtml(null) // ''
+ */
+export function escapeHtml(value: unknown): string {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 export type Result<T, E = Error> =
   | { ok: true; value: T }
   | { ok: false; error: E };

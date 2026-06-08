@@ -1,4 +1,4 @@
-import { normalize, toCurrencyFromCents, formatDate } from "@clinic/shared";
+import { normalize, toCurrencyFromCents, formatDate, escapeHtml } from "@clinic/shared";
 
 const API_BASE_URL = window.location.origin;
 const tokenKey = "clinic.session.token";
@@ -5555,14 +5555,7 @@ function csv(value) {
 
 // normalize() importada de @clinic/shared \u2014 ver packages/shared/src/index.ts
 
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+// escapeHtml importada de @clinic/shared — ver packages/shared/src/index.ts
 
 function setDefaultAppointmentTimes() {
   const start = new Date(Date.now() + 60 * 60 * 1000);

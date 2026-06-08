@@ -1,4 +1,4 @@
-import { normalize, toCurrencyFromCents } from "@clinic/shared";
+import { normalize, toCurrencyFromCents, formatDate } from "@clinic/shared";
 
 const API_BASE_URL = window.location.origin;
 const tokenKey = "clinic.session.token";
@@ -578,8 +578,7 @@ const els = {
   accessDeniedSummary: document.querySelector("#accessDeniedSummary")
 };
 
-// toCurrencyFromCents importada de @clinic/shared — ver packages/shared/src/index.ts
-const dateTime = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" });
+// toCurrencyFromCents e formatDate importadas de @clinic/shared — ver packages/shared/src/index.ts
 
 initializeSidebar();
 renderNavigation();
@@ -5547,11 +5546,7 @@ function sortTotemTicketsClient(a, b) {
   return new Date(a.issuedAt).getTime() - new Date(b.issuedAt).getTime();
 }
 
-function formatDate(value) {
-  if (!value) return "Sem data";
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? value : dateTime.format(date);
-}
+// formatDate importada de @clinic/shared — ver packages/shared/src/index.ts
 
 function csv(value) {
   if (Array.isArray(value)) return value.map(String).filter(Boolean);

@@ -221,6 +221,112 @@ describe("Finance entries", () => {
   });
 });
 
+describe("Appointment status transitions", () => {
+  it("PATCH /v1/appointments/:id/status updates status", async () => {
+    const create = await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_status_test",
+      professionalId: "pro_status_test",
+      startsAt: "2026-08-01T09:00:00.000Z",
+      endsAt: "2026-08-01T09:30:00.000Z"
+    });
+    expect(create.status).toBe(201);
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const patch = await request(port, "PATCH", `/v1/appointments/${id}/status`, {
+      status: "confirmed"
+    });
+    expect(patch.status).toBe(200);
+    const updated = ((patch.body as Record<string, unknown>).data as Record<string, unknown>);
+    expect(updated.status).toBe("confirmed");
+    expect(updated.id).toBe(id);
+  });
+
+  it("PATCH /v1/appointments/:id/status returns 400 for invalid status", async () => {
+    const create = await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_bad_status",
+      professionalId: "pro_bad_status",
+      startsAt: "2026-08-02T09:00:00.000Z",
+      endsAt: "2026-08-02T09:30:00.000Z"
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const patch = await request(port, "PATCH", `/v1/appointments/${id}/status`, {
+      status: "invalid_status"
+    });
+    expect(patch.status).toBe(400);
+  });
+
+  it("PATCH /v1/appointments/:id/status returns 404 for unknown id", async () => {
+    const patch = await request(port, "PATCH", "/v1/appointments/nonexistent_id/status", {
+      status: "confirmed"
+    });
+    expect(patch.status).toBe(404);
+  });
+
+  it("all valid statuses are accepted", async () => {
+    const validStatuses = ["scheduled", "confirmed", "checked_in", "in_attendance", "completed", "cancelled", "no_show"];
+
+    const create = await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_all_statuses",
+      professionalId: "pro_all_statuses",
+      startsAt: "2026-09-01T09:00:00.000Z",
+      endsAt: "2026-09-01T09:30:00.000Z"
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    for (const status of validStatuses) {
+      const patch = await request(port, "PATCH", `/v1/appointments/${id}/status`, { status });
+      expect(patch.status, `status "${status}" should be accepted`).toBe(200);
+    }
+  });
+});
+
+describe("Finance entry reconciliation", () => {
+  it("PATCH /v1/finance/entries/:id/reconciliation marks entry as reconciled", async () => {
+    const create = await request(port, "POST", "/v1/finance/entries", {
+      direction: "receivable",
+      description: "Consulta reconciliada",
+      amountCents: 30000,
+      dueDate: "2026-08-31"
+    });
+    expect(create.status).toBe(201);
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const patch = await request(port, "PATCH", `/v1/finance/entries/${id}/reconciliation`, {
+      reconciliationStatus: "reconciled"
+    });
+    expect(patch.status).toBe(200);
+    const updated = ((patch.body as Record<string, unknown>).data as Record<string, unknown>);
+    expect(updated.reconciliationStatus).toBe("reconciled");
+    expect(updated.id).toBe(id);
+  });
+
+  it("PATCH /v1/finance/entries/:id/reconciliation returns 404 for unknown id", async () => {
+    const patch = await request(port, "PATCH", "/v1/finance/entries/nonexistent/reconciliation", {
+      reconciliationStatus: "reconciled"
+    });
+    expect(patch.status).toBe(404);
+  });
+
+  it("PATCH /v1/finance/entries/:id/reconciliation accepts divergent status", async () => {
+    const create = await request(port, "POST", "/v1/finance/entries", {
+      direction: "payable",
+      description: "Fornecedor divergente",
+      amountCents: 5000,
+      dueDate: "2026-08-31"
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const patch = await request(port, "PATCH", `/v1/finance/entries/${id}/reconciliation`, {
+      reconciliationStatus: "divergent",
+      reconciliationNotes: "Valor divergente em R$ 10,00"
+    });
+    expect(patch.status).toBe(200);
+    const updated = ((patch.body as Record<string, unknown>).data as Record<string, unknown>);
+    expect(updated.reconciliationStatus).toBe("divergent");
+  });
+});
+
 describe("Unknown routes", () => {
   it("GET unknown path returns 404", async () => {
     const { status } = await request(port, "GET", "/v1/does-not-exist");

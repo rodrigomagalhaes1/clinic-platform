@@ -1,16 +1,10 @@
 $ProjectDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$CodexNode = Join-Path $env:LOCALAPPDATA "OpenAI\Codex\bin\node.exe"
 $NodeCommand = Get-Command node -ErrorAction SilentlyContinue
 
-if ($NodeCommand) {
-  & $NodeCommand.Source "--no-warnings" (Join-Path $ProjectDir "apps\clinic-server-runtime.mjs")
-  exit $LASTEXITCODE
+if (-not $NodeCommand) {
+  Write-Error "Node.js nao foi encontrado. Instale o Node.js 20 ou superior: https://nodejs.org"
+  exit 1
 }
 
-if (Test-Path $CodexNode) {
-  & $CodexNode "--no-warnings" (Join-Path $ProjectDir "apps\clinic-server-runtime.mjs")
-  exit $LASTEXITCODE
-}
-
-Write-Error "Node.js nao foi encontrado. Instale o Node.js 20 ou superior, ou execute pelo ambiente do Codex."
-exit 1
+Write-Host "Iniciando Clinic Full Stack em http://localhost:5173"
+& $NodeCommand.Source "--no-warnings" (Join-Path $ProjectDir "apps\clinic-server-runtime.mjs")

@@ -2,19 +2,24 @@
 setlocal
 
 set "PROJECT_DIR=%~dp0"
-set "CODEX_NODE=%LOCALAPPDATA%\OpenAI\Codex\bin\node.exe"
-
-if exist "%CODEX_NODE%" (
-  "%CODEX_NODE%" "%PROJECT_DIR%apps\web\serve-static.mjs"
-  exit /b %ERRORLEVEL%
-)
 
 where node >nul 2>nul
-if %ERRORLEVEL% EQU 0 (
-  node "%PROJECT_DIR%apps\web\serve-static.mjs"
-  exit /b %ERRORLEVEL%
+if %ERRORLEVEL% NEQ 0 (
+  echo Node.js nao foi encontrado.
+  echo Instale o Node.js 20 ou superior: https://nodejs.org
+  exit /b 1
 )
 
-echo Node.js nao foi encontrado.
-echo Instale o Node.js 20 ou superior, ou execute pelo ambiente do Codex.
-exit /b 1
+if not exist "%PROJECT_DIR%node_modules" (
+  echo Instalando dependencias...
+  pushd "%PROJECT_DIR%"
+  npm install
+  popd
+)
+
+echo Iniciando Vite dev server em http://localhost:5174
+echo O servidor Full Stack deve estar rodando em http://localhost:5173
+echo.
+pushd "%PROJECT_DIR%apps\web"
+npx vite --config "%PROJECT_DIR%apps\web\vite.config.js" --port 5174
+popd

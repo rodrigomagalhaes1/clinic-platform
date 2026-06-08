@@ -43,6 +43,13 @@ export function notFound(response: ServerResponse) {
   });
 }
 
+export class BadRequestError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "BadRequestError";
+  }
+}
+
 export async function parseJsonBody(request: IncomingMessage): Promise<JsonRecord> {
   const chunks: Buffer[] = [];
 
@@ -55,7 +62,12 @@ export async function parseJsonBody(request: IncomingMessage): Promise<JsonRecor
   }
 
   const text = Buffer.concat(chunks).toString("utf8");
-  return JSON.parse(text) as JsonRecord;
+
+  try {
+    return JSON.parse(text) as JsonRecord;
+  } catch {
+    throw new BadRequestError("Invalid JSON body");
+  }
 }
 
 function dateReplacer(_key: string, value: unknown) {

@@ -327,6 +327,19 @@ describe("Finance entry reconciliation", () => {
   });
 });
 
+describe("Malformed request body", () => {
+  it("POST with invalid JSON returns 400 not 500", async () => {
+    const res = await fetch(`http://127.0.0.1:${port}/v1/patients`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{ invalid json }"
+    });
+    expect(res.status).toBe(400);
+    const body = await res.json() as Record<string, unknown>;
+    expect((body.error as Record<string, unknown>).code).toBe("bad_request");
+  });
+});
+
 describe("Unknown routes", () => {
   it("GET unknown path returns 404", async () => {
     const { status } = await request(port, "GET", "/v1/does-not-exist");

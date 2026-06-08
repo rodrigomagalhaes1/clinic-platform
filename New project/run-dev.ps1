@@ -3,10 +3,17 @@ $LogDir = Join-Path $ProjectDir "logs"
 
 New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 
-Start-Process -FilePath "cmd.exe" -ArgumentList "/k", "cd /d `"$ProjectDir`" && call run-api.cmd > `"$LogDir\api.log`" 2> `"$LogDir\api.error.log`"" -WindowStyle Minimized
+Write-Host "Iniciando ambiente de desenvolvimento..."
+Write-Host ""
+
+# Full Stack server (API + web na porta 5173)
+Start-Process -FilePath "cmd.exe" -ArgumentList "/k", "cd /d `"$ProjectDir`" && call run-clinic.cmd > `"$LogDir\server.log`" 2> `"$LogDir\server.error.log`"" -WindowStyle Minimized
+
+Start-Sleep -Seconds 2
+
+# Vite dev server com HMR (proxia /v1 para 5173)
 Start-Process -FilePath "cmd.exe" -ArgumentList "/k", "cd /d `"$ProjectDir`" && call run-web.cmd > `"$LogDir\web.log`" 2> `"$LogDir\web.error.log`"" -WindowStyle Minimized
 
-Write-Host "API: http://localhost:3333"
-Write-Host "Web: http://localhost:5173"
+Write-Host "Full Stack (API + web): http://localhost:5173"
+Write-Host "Vite dev (HMR):         http://localhost:5174"
 Write-Host "Logs: $LogDir"
-

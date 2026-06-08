@@ -72,3 +72,25 @@ jobs:
       - name: Build packages
         run: npm run build --workspaces --if-present
         working-directory: "New project"
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: "New project/package-lock.json"
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: "New project"
+
+      - name: Lint
+        run: npm run lint
+        working-directory: "New project"

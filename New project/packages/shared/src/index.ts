@@ -30,6 +30,21 @@ export function escapeHtml(value: unknown): string {
     .replaceAll("'", "&#039;");
 }
 
+/**
+ * Converte um valor para array de strings não-vazias.
+ * Aceita arrays (retorna cópia filtrada) ou strings separadas por vírgula.
+ * Retorna [] para null, undefined ou string vazia.
+ *
+ * @example parseList("admin,manager, billing") // ["admin", "manager", "billing"]
+ * @example parseList(["a", "", "b"])            // ["a", "b"]
+ * @example parseList(null)                      // []
+ */
+export function parseList(value: unknown): string[] {
+  if (Array.isArray(value)) return value.map(String).filter(Boolean);
+  if (!value) return [];
+  return String(value).split(",").map((item) => item.trim()).filter(Boolean);
+}
+
 export type Result<T, E = Error> =
   | { ok: true; value: T }
   | { ok: false; error: E };

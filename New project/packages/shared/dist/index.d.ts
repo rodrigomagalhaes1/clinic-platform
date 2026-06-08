@@ -15,6 +15,16 @@ export declare function formatDate(value: string | Date | null | undefined): str
  * @example escapeHtml(null) // ''
  */
 export declare function escapeHtml(value: unknown): string;
+/**
+ * Converte um valor para array de strings não-vazias.
+ * Aceita arrays (retorna cópia filtrada) ou strings separadas por vírgula.
+ * Retorna [] para null, undefined ou string vazia.
+ *
+ * @example parseList("admin,manager, billing") // ["admin", "manager", "billing"]
+ * @example parseList(["a", "", "b"])            // ["a", "b"]
+ * @example parseList(null)                      // []
+ */
+export declare function parseList(value: unknown): string[];
 export type Result<T, E = Error> = {
     ok: true;
     value: T;

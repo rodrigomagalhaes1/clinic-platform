@@ -6,7 +6,7 @@ import { dirname, extname, isAbsolute, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { DatabaseSync } from "node:sqlite";
-import { normalize as normalizeText } from "@clinic/shared";
+import { normalize as normalizeText, parseList } from "@clinic/shared";
 import { createAppointmentsModule } from "./modules/appointments.mjs";
 import { composeRouteModules } from "./modules/router.mjs";
 import { createUraModule } from "./modules/relationship-ura.mjs";
@@ -1738,15 +1738,9 @@ function normalizeRole(role) {
   return allowed.includes(String(role)) ? String(role) : "viewer";
 }
 
-function normalizeModules(value) {
-  return normalizeList(value);
-}
-
-function normalizeList(value) {
-  if (Array.isArray(value)) return value.map(String).filter(Boolean);
-  if (typeof value !== "string" || !value.trim()) return [];
-  return value.split(",").map((item) => item.trim()).filter(Boolean);
-}
+// normalizeList / normalizeModules importadas de @clinic/shared como parseList
+const normalizeList = parseList;
+const normalizeModules = parseList;
 
 function userGroupByName(value) {
   const name = String(value ?? "").trim();

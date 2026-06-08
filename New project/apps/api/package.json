@@ -1,0 +1,20 @@
+{
+  "name": "@clinic/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node src/main.ts",
+    "start": "node src/main.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@clinic/domain": "0.1.0",
+    "@clinic/agents": "0.1.0",
+    "@clinic/shared": "0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0"
+  }
+}

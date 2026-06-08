@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Bandejas de microverdes BrotoLab</title>
+  <desc id="desc">Ilustracao editorial com bandejas de microverdes, brotos e folhas jovens em cultivo urbano.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f7ffe7"/>
+      <stop offset=".48" stop-color="#d9e9c8"/>
+      <stop offset="1" stop-color="#eef7e6"/>
+    </linearGradient>
+    <linearGradient id="tray" x1="0" x2="1">
+      <stop offset="0" stop-color="#24362b"/>
+      <stop offset="1" stop-color="#111a15"/>
+    </linearGradient>
+    <pattern id="soil" width="18" height="18" patternUnits="userSpaceOnUse">
+      <rect width="18" height="18" fill="#4b3428"/>
+      <circle cx="4" cy="5" r="1.8" fill="#6a4a38"/>
+      <circle cx="12" cy="11" r="2.2" fill="#39271f"/>
+      <circle cx="16" cy="3" r="1.4" fill="#73513c"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="22" stdDeviation="24" flood-color="#263425" flood-opacity=".22"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <circle cx="1320" cy="150" r="180" fill="#d7f06a" opacity=".55"/>
+  <circle cx="1190" cy="790" r="280" fill="#ffffff" opacity=".45"/>
+  <g filter="url(#shadow)" transform="translate(200 170) rotate(-5 600 330)">
+    <rect x="40" y="250" width="1120" height="500" rx="34" fill="url(#tray)"/>
+    <rect x="90" y="300" width="1020" height="390" rx="18" fill="url(#soil)"/>
+    <g stroke="#2f8a4f" stroke-width="7" stroke-linecap="round">
+      <path d="M160 625 C150 540 166 470 200 390"/>
+      <path d="M240 632 C232 540 252 455 294 360"/>
+      <path d="M328 634 C320 520 340 445 378 350"/>
+      <path d="M420 638 C410 540 430 445 470 345"/>
+      <path d="M516 634 C506 520 530 430 580 338"/>
+      <path d="M616 640 C604 540 632 440 680 342"/>
+      <path d="M718 636 C704 535 730 455 780 355"/>
+      <path d="M820 636 C810 545 830 458 884 365"/>
+      <path d="M922 638 C910 530 940 440 988 350"/>
+      <path d="M1022 630 C1018 540 1038 470 1070 390"/>
+    </g>
+    <g fill="#69bd55">
+      <ellipse cx="198" cy="382" rx="52" ry="25" transform="rotate(-28 198 382)"/>
+      <ellipse cx="214" cy="382" rx="48" ry="24" transform="rotate(26 214 382)"/>
+      <ellipse cx="292" cy="354" rx="58" ry="27" transform="rotate(-20 292 354)"/>
+      <ellipse cx="315" cy="354" rx="50" ry="24" transform="rotate(28 315 354)"/>
+      <ellipse cx="375" cy="348" rx="50" ry="25" transform="rotate(-30 375 348)"/>
+      <ellipse cx="398" cy="348" rx="54" ry="25" transform="rotate(18 398 348)"/>
+      <ellipse cx="470" cy="346" rx="57" ry="28" transform="rotate(-22 470 346)"/>
+      <ellipse cx="495" cy="344" rx="48" ry="24" transform="rotate(30 495 344)"/>
+      <ellipse cx="578" cy="336" rx="64" ry="29" transform="rotate(-18 578 336)"/>
+      <ellipse cx="604" cy="338" rx="55" ry="26" transform="rotate(24 604 338)"/>
+      <ellipse cx="678" cy="342" rx="56" ry="26" transform="rotate(-25 678 342)"/>
+      <ellipse cx="704" cy="340" rx="52" ry="24" transform="rotate(25 704 340)"/>
+      <ellipse cx="778" cy="352" rx="54" ry="24" transform="rotate(-24 778 352)"/>
+      <ellipse cx="804" cy="352" rx="58" ry="25" transform="rotate(22 804 352)"/>
+      <ellipse cx="882" cy="364" rx="50" ry="23" transform="rotate(-22 882 364)"/>
+      <ellipse cx="908" cy="365" rx="52" ry="24" transform="rotate(26 908 365)"/>
+      <ellipse cx="986" cy="350" rx="62" ry="28" transform="rotate(-25 986 350)"/>
+      <ellipse cx="1013" cy="350" rx="55" ry="26" transform="rotate(26 1013 350)"/>
+      <ellipse cx="1068" cy="388" rx="48" ry="23" transform="rotate(-18 1068 388)"/>
+      <ellipse cx="1092" cy="388" rx="50" ry="24" transform="rotate(29 1092 388)"/>
+    </g>
+    <g fill="#d85c3a" opacity=".95">
+      <ellipse cx="352" cy="390" rx="22" ry="10" transform="rotate(25 352 390)"/>
+      <ellipse cx="742" cy="395" rx="20" ry="10" transform="rotate(-18 742 395)"/>
+      <ellipse cx="962" cy="405" rx="23" ry="11" transform="rotate(18 962 405)"/>
+    </g>
+  </g>
+  <g opacity=".88">
+    <rect x="1065" y="170" width="250" height="122" rx="18" fill="#fffdf7"/>
+    <text x="1092" y="220" fill="#155a34" font-family="Arial, sans-serif" font-size="34" font-weight="800">colha viva</text>
+    <text x="1092" y="258" fill="#637066" font-family="Arial, sans-serif" font-size="20">do cultivo ao prato</text>
+  </g>
+</svg>

@@ -1,0 +1,1358 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Plataforma local para automacao de clinica medica." />
+    <title>Clinic Automation</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <svg aria-hidden="true" class="sprite">
+      <symbol id="icon-dashboard" viewBox="0 0 24 24"><path d="M4 13h7V4H4v9Zm9 7h7V4h-7v16ZM4 20h7v-5H4v5Z"/></symbol>
+      <symbol id="icon-users" viewBox="0 0 24 24"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3ZM8 11c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z"/></symbol>
+      <symbol id="icon-image" viewBox="0 0 24 24"><path d="M4 5h16v14H4V5Zm2 2v10h12V7H6Zm2 8 2.5-3 2 2.4 2.5-3.4 2 4H8Zm2-5.5A1.5 1.5 0 1 1 10 6.5a1.5 1.5 0 0 1 0 3Z"/></symbol>
+      <symbol id="icon-lab" viewBox="0 0 24 24"><path d="M9 3h6v2h-1v4.2l4.8 8.4A2.2 2.2 0 0 1 16.9 21H7.1a2.2 2.2 0 0 1-1.9-3.4L10 9.2V5H9V3Zm3 7-2.2 3.8h4.4L12 10Z"/></symbol>
+      <symbol id="icon-bill" viewBox="0 0 24 24"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2V2Zm3 5h6V5H9v2Zm0 4h6V9H9v2Zm0 4h4v-2H9v2Z"/></symbol>
+      <symbol id="icon-wallet" viewBox="0 0 24 24"><path d="M3 6c0-1.1.9-2 2-2h14v4h1c.55 0 1 .45 1 1v10c0 .55-.45 1-1 1H5c-1.1 0-2-.9-2-2V6Zm2 2h12V6H5v2Zm12 5.5A1.5 1.5 0 1 0 17 16.5a1.5 1.5 0 0 0 0-3Z"/></symbol>
+      <symbol id="icon-phone" viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.8-.4 1.2-.3 1.3.4 2.6.6 4 .6.8 0 1.4.6 1.4 1.4v3.5c0 .8-.6 1.4-1.4 1.4C10.3 22.4 1.6 13.7 1.6 3.4 1.6 2.6 2.2 2 3 2h3.5c.8 0 1.4.6 1.4 1.4 0 1.4.2 2.7.6 4 .1.4 0 .9-.3 1.2l-1.6 2.2Zm11.9-4.1V2h2v8h-8V8h4.7l-5.6-5.6L13 1l5.5 5.7Z"/></symbol>
+      <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3Zm-1 14-3-3 1.4-1.4 1.6 1.6 4.6-4.6L17 10l-6 6Z"/></symbol>
+      <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M19.4 13.5c.1-.5.1-1 .1-1.5s0-1-.1-1.5l2-1.5-2-3.5-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2h-4l-.4 2.5A7.6 7.6 0 0 0 7 6L4.6 5l-2 3.5 2 1.5A8 8 0 0 0 4.5 12c0 .5 0 1 .1 1.5l-2 1.5 2 3.5 2.4-1a7.6 7.6 0 0 0 2.6 1.5L10 22h4l.4-2.5A7.6 7.6 0 0 0 17 18l2.4 1 2-3.5-2-1.5ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"/></symbol>
+    </svg>
+
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">CA</span>
+          <div class="brand-text">
+            <strong>Clinic Automation</strong>
+            <small id="apiStatus">conectando</small>
+          </div>
+          <button class="sidebar-pin" type="button" id="sidebarPinButton" aria-label="Fixar menu aberto" title="Fixar menu aberto">☰</button>
+        </div>
+        <nav class="nav" id="mainNav" aria-label="Menu principal">
+          <a class="nav-parent" href="#dashboard" data-route="dashboard" data-section="dashboard" data-parent="dashboard"><svg><use href="#icon-dashboard"></use></svg>Dashboard</a>
+
+          <div class="nav-group" data-nav-parent="attendance">
+            <a class="nav-parent" href="#attendance" data-route="attendance" data-section="attendance" data-parent="attendance"><svg><use href="#icon-users"></use></svg>Atendimento</a>
+            <div class="submenu">
+              <a href="#attendance-frontdesk" data-route="attendance-frontdesk" data-section="attendance" data-parent="attendance">Recepção</a>
+              <a href="#attendance-patients" data-route="attendance-patients" data-section="attendance" data-parent="attendance">Pacientes</a>
+              <a href="#attendance-appointments" data-route="attendance-appointments" data-section="attendance" data-parent="attendance">Agenda</a>
+              <a href="#attendance-totem" data-route="attendance-totem" data-section="attendance" data-parent="attendance">Totem</a>
+            </div>
+          </div>
+
+          <div class="nav-group" data-nav-parent="imaging">
+            <a class="nav-parent" href="#imaging" data-route="imaging" data-section="imaging" data-parent="imaging"><svg><use href="#icon-image"></use></svg>Central de Laudos</a>
+            <div class="submenu">
+              <a href="#imaging-reports" data-route="imaging-reports" data-section="imaging" data-parent="imaging">Laudos</a>
+            </div>
+          </div>
+
+          <div class="nav-group" data-nav-parent="laboratory">
+            <a class="nav-parent" href="#laboratory" data-route="laboratory" data-section="laboratory" data-parent="laboratory"><svg><use href="#icon-lab"></use></svg>Laboratório</a>
+            <div class="submenu">
+              <a href="#laboratory-orders" data-route="laboratory-orders" data-section="laboratory" data-parent="laboratory">Pedidos e coletas</a>
+              <a href="#laboratory-support" data-route="laboratory-support" data-section="laboratory" data-parent="laboratory">Laboratório de apoio</a>
+            </div>
+          </div>
+
+          <div class="nav-group" data-nav-parent="billing">
+            <a class="nav-parent" href="#billing" data-route="billing" data-section="billing" data-parent="billing"><svg><use href="#icon-bill"></use></svg>Faturamento</a>
+            <div class="submenu">
+              <a href="#billing-invoices" data-route="billing-invoices" data-section="billing" data-parent="billing">Faturas</a>
+              <a href="#billing-batches" data-route="billing-batches" data-section="billing" data-parent="billing">Lotes</a>
+              <a href="#billing-denials" data-route="billing-denials" data-section="billing" data-parent="billing">Glosas</a>
+              <a href="#billing-payouts" data-route="billing-payouts" data-section="billing" data-parent="billing">Repasses</a>
+            </div>
+          </div>
+
+          <div class="nav-group" data-nav-parent="finance">
+            <a class="nav-parent" href="#finance" data-route="finance" data-section="finance" data-parent="finance"><svg><use href="#icon-wallet"></use></svg>Financeiro</a>
+            <div class="submenu">
+              <a href="#finance-receivables" data-route="finance-receivables" data-section="finance" data-parent="finance">A receber</a>
+              <a href="#finance-payables" data-route="finance-payables" data-section="finance" data-parent="finance">A pagar</a>
+              <a href="#finance-cash" data-route="finance-cash" data-section="finance" data-parent="finance">Caixa</a>
+              <a href="#finance-reconciliation" data-route="finance-reconciliation" data-section="finance" data-parent="finance">Conciliação</a>
+            </div>
+          </div>
+
+          <div class="nav-group" data-nav-parent="relationship">
+            <a class="nav-parent" href="#relationship-ura" data-route="relationship-ura" data-section="relationship" data-parent="relationship"><svg><use href="#icon-phone"></use></svg>Relacionamento</a>
+            <div class="submenu">
+              <a href="#relationship-ura" data-route="relationship-ura" data-section="relationship" data-parent="relationship">URA</a>
+              <a href="#relationship-whatsapp" data-route="relationship-whatsapp" data-section="relationship" data-parent="relationship">WhatsApp</a>
+              <a href="#relationship-reputation" data-route="relationship-reputation" data-section="relationship" data-parent="relationship">Reputação</a>
+              <a href="#relationship-social" data-route="relationship-social" data-section="relationship" data-parent="relationship">Redes sociais</a>
+              <a href="#relationship-agent" data-route="relationship-agent" data-section="relationship" data-parent="relationship">Agente</a>
+            </div>
+          </div>
+
+          <a class="nav-parent" href="#human-resources" data-route="human-resources" data-section="human-resources" data-parent="human-resources"><svg><use href="#icon-users"></use></svg>Recursos Humanos</a>
+
+          <div class="nav-group" data-nav-parent="settings">
+            <a class="nav-parent" href="#settings" data-route="settings" data-section="settings" data-parent="settings"><svg><use href="#icon-settings"></use></svg>Configurações</a>
+            <div class="submenu">
+              <a href="#settings-attendance" data-route="settings-attendance" data-section="settings" data-parent="settings">Atendimento</a>
+              <a href="#settings-imaging" data-route="settings-imaging" data-section="settings" data-parent="settings">Central de Laudos</a>
+              <a href="#settings-laboratory" data-route="settings-laboratory" data-section="settings" data-parent="settings">Laboratório</a>
+              <a href="#settings-finance" data-route="settings-finance" data-section="settings" data-parent="settings">Financeiro</a>
+              <a href="#settings-relationship" data-route="settings-relationship" data-section="settings" data-parent="settings">Relacionamento</a>
+              <a href="#settings-security" data-route="settings-security" data-section="settings" data-parent="settings">Segurança</a>
+              <a href="#settings-registries" data-route="settings-registries" data-section="settings" data-parent="settings">Cadastros</a>
+              <a href="#settings-integrations" data-route="settings-integrations" data-section="settings" data-parent="settings">Integrações</a>
+              <a href="#settings-menus" data-route="settings-menus" data-section="settings" data-parent="settings">Menus do sistema</a>
+            </div>
+          </div>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Ambiente local</p>
+            <h1 id="pageTitle">Dashboard</h1>
+          </div>
+          <div class="session">
+            <span id="sessionChip">sem sessao</span>
+            <button class="secondary" type="button" id="refreshButton">Atualizar</button>
+            <button class="secondary" type="button" id="logoutButton">Sair</button>
+          </div>
+        </header>
+
+        <section id="dashboard" class="section active-section" data-title="Dashboard">
+          <div class="summary-grid" id="dashboardSummary"></div>
+          <div class="panel">
+            <div class="panel-heading">
+              <h2>Fila operacional</h2>
+              <span class="badge" id="appointmentCount">0 atendimentos</span>
+            </div>
+            <div class="list" id="dashboardAppointments"></div>
+          </div>
+        </section>
+
+        <section id="attendance" class="section" data-title="Atendimento">
+          <div class="frontdesk-page" data-subview="frontdesk">
+            <details class="panel frontdesk-filters" open>
+              <summary>
+                <span>Filtros da central</span>
+                <span class="badge" id="frontdeskFilteredCount">0 registros</span>
+              </summary>
+              <form class="form-grid filter-form" id="frontdeskFilterForm">
+                <label>Busca geral <input name="search" id="frontdeskSearch" placeholder="Paciente, CPF, guia, accession, medico ou procedimento" /></label>
+                <label>Data inicial <input name="dateFrom" id="frontdeskDateFrom" type="date" /></label>
+                <label>Data final <input name="dateTo" id="frontdeskDateTo" type="date" /></label>
+                <label>Filial <select name="branchName" id="frontdeskBranchFilter"></select></label>
+                <label>Unidade <select name="unitName" id="frontdeskUnitFilter"></select></label>
+                <label>Sala <select name="roomName" id="frontdeskRoomFilter"></select></label>
+                <label>Modalidade <select name="modality" id="frontdeskModalityFilter"></select></label>
+                <label>Convênio <select name="insuranceName" id="frontdeskInsuranceFilter"></select></label>
+                <label>Plano <select name="planName" id="frontdeskPlanFilter"></select></label>
+                <label>Situação
+                  <select name="status" id="frontdeskStatusFilter">
+                    <option value="">Todas</option>
+                    <option value="scheduled">Agendado</option>
+                    <option value="confirmed">Confirmado</option>
+                    <option value="checked_in">Check-in</option>
+                    <option value="in_attendance">Em atendimento</option>
+                    <option value="completed">Concluído</option>
+                    <option value="cancelled">Cancelado</option>
+                    <option value="no_show">Faltou</option>
+                  </select>
+                </label>
+                <label>Fluxo
+                  <select name="flow" id="frontdeskFlowFilter">
+                    <option value="">Todos</option>
+                    <option value="pending">Possui pendências</option>
+                    <option value="authorized">Autorizado</option>
+                    <option value="authorization_pending">Autorização pendente</option>
+                    <option value="guide_missing">Guia pendente</option>
+                    <option value="walk_in">Encaixe</option>
+                    <option value="urgent_care">Pronto Atendimento</option>
+                    <option value="completed">Executado</option>
+                    <option value="billing_pending">Faturamento pendente</option>
+                  </select>
+                </label>
+                <label>Médico <input name="doctor" id="frontdeskDoctorFilter" placeholder="Solicitante, executor ou agenda" /></label>
+                <label>Código pagamento <input name="paymentCode" id="frontdeskPaymentCodeFilter" /></label>
+                <div class="action-row span-2">
+                  <button type="submit">Aplicar filtros</button>
+                  <button class="secondary" type="button" id="frontdeskClearFilters">Limpar</button>
+                  <button class="secondary" type="button" id="frontdeskSaveFilters">Salvar preferência</button>
+                </div>
+              </form>
+            </details>
+            <div class="panel">
+              <div class="panel-heading">
+                <h2>Central de Atendimento</h2>
+                <div class="action-row">
+                  <a class="button-link" href="#attendance-walkin">Encaixe</a>
+                  <a class="button-link secondary-link" href="#attendance-emergency">Pronto Atendimento</a>
+                  <span class="badge" id="frontdeskTableCount">0 atendimento(s)</span>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Ações</th>
+                      <th>Data</th>
+                      <th>Horário</th>
+                      <th>Paciente</th>
+                      <th>Procedimento</th>
+                      <th>Situação</th>
+                      <th>Convênio</th>
+                      <th>Sala</th>
+                      <th>Médico</th>
+                      <th>Pendências</th>
+                    </tr>
+                  </thead>
+                  <tbody id="frontdeskTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="summary-grid" id="frontdeskSummary"></div>
+            <div class="frontdesk-layout">
+              <div class="panel">
+                <div class="panel-heading">
+                  <h2>Jornada do atendimento</h2>
+                  <span class="badge" id="frontdeskActiveCount">0 ativos</span>
+                </div>
+                <div class="journey-board" id="frontdeskJourney"></div>
+              </div>
+              <div class="panel">
+                <div class="panel-heading">
+                  <h2>Fila operacional</h2>
+                  <span class="badge" id="frontdeskPendingCount">0 pendencias</span>
+                </div>
+                <div class="list" id="frontdeskQueueList"></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-heading">
+                <h2>Ficha, convênio e encaminhamento</h2>
+                <span class="badge">Recepção</span>
+              </div>
+              <div class="operational-grid" id="frontdeskDetailList"></div>
+            </div>
+          </div>
+          <div class="walkin-page" data-subview="walkin">
+            <form class="panel form-grid detail-form" id="walkinForm">
+              <div class="panel-heading">
+                <h2>Encaixe de Atendimento</h2>
+                <button class="secondary" type="button" id="walkinImportButton">Importar</button>
+              </div>
+              <label>Paciente <select name="patientId" id="walkinPatientSelect" required></select></label>
+              <label>Filial <select name="branchName" id="walkinBranchSelect"></select></label>
+              <label>Matrícula <input name="memberId" id="walkinMemberInput" /></label>
+              <label>Convênio <select name="insuranceName" id="walkinInsuranceSelect"></select></label>
+              <label>Plano <select name="planName" id="walkinPlanSelect"></select></label>
+              <label>Guia <input name="guideNumber" id="walkinGuideInput" /></label>
+              <label>CRM solicitante <input name="requesterCrm" id="walkinRequesterCrmInput" /></label>
+              <label>Data <input name="date" id="walkinDateInput" type="date" required /></label>
+              <label>Hora <input name="time" id="walkinTimeInput" type="time" required /></label>
+              <label>Procedimento <select name="procedureName" id="walkinProcedureSelect"></select></label>
+              <label>Sala <select name="roomName" id="walkinRoomSelect"></select></label>
+              <label>Médico executor <select name="professionalId" id="walkinDoctorSelect"></select></label>
+              <label>Médico solicitante <input name="requesterDoctor" id="walkinRequesterDoctorInput" /></label>
+              <label class="span-2">Nota atendimento <textarea name="orderSummary" rows="2" placeholder="Observações, pedido, preparo ou hipótese clínica"></textarea></label>
+              <div class="action-row span-2">
+                <button type="submit">Adicionar</button>
+                <button class="secondary" type="button" id="walkinSaveButton">Salvar encaixes</button>
+                <button class="secondary" type="button" id="walkinClearButton">Limpar lista</button>
+              </div>
+            </form>
+            <div class="panel">
+              <div class="panel-heading">
+                <h2>Atendimentos para Encaixe</h2>
+                <span class="badge" id="walkinItemsCount">0 itens</span>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Hora</th>
+                      <th>Procedimento</th>
+                      <th>Sala</th>
+                      <th>Médico solicitante</th>
+                      <th>Médico executor</th>
+                      <th>Guia</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="walkinItemsTable"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="emergency-page" data-subview="emergency">
+            <form class="panel form-grid detail-form" id="emergencyForm">
+              <div class="panel-heading">
+                <h2>Pronto Atendimento</h2>
+                <span class="badge">Triagem e fila imediata</span>
+              </div>
+              <label>Paciente <select name="patientId" id="emergencyPatientSelect" required></select></label>
+              <label>Filial <select name="branchName" id="emergencyBranchSelect"></select></label>
+              <label>Origem
+                <select name="requestSource" id="emergencySourceSelect">
+                  <option value="reception">Recepção</option>
+                  <option value="phone">Telefone</option>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="referral">Encaminhamento</option>
+                  <option value="external">Externo</option>
+                </select>
+              </label>
+              <label>Prioridade
+                <select name="priority" id="emergencyPrioritySelect">
+                  <option value="routine">Rotina</option>
+                  <option value="priority">Prioritario</option>
+                  <option value="urgent">Urgente</option>
+                  <option value="emergency">Emergencia</option>
+                </select>
+              </label>
+              <label>Classificacao de risco
+                <select name="triageColor" id="emergencyTriageColorSelect">
+                  <option value="green">Verde</option>
+                  <option value="blue">Azul</option>
+                  <option value="yellow">Amarelo</option>
+                  <option value="orange">Laranja</option>
+                  <option value="red">Vermelho</option>
+                </select>
+              </label>
+              <label>Procedimento <select name="procedureName" id="emergencyProcedureSelect"></select></label>
+              <label>Sala <select name="roomName" id="emergencyRoomSelect"></select></label>
+              <label>Medico executor <select name="professionalId" id="emergencyDoctorSelect"></select></label>
+              <label>Convenio <select name="insuranceName" id="emergencyInsuranceSelect"></select></label>
+              <label>Plano <select name="planName" id="emergencyPlanSelect"></select></label>
+              <label>Carteirinha <input name="memberId" id="emergencyMemberInput" /></label>
+              <label>Guia <input name="guideNumber" id="emergencyGuideInput" /></label>
+              <label>Acompanhante <input name="companionName" id="emergencyCompanionInput" /></label>
+              <label>Pressao arterial <input name="bloodPressure" id="emergencyBloodPressureInput" placeholder="120/80" /></label>
+              <label>Frequencia cardiaca <input name="heartRate" id="emergencyHeartRateInput" placeholder="bpm" /></label>
+              <label>Saturacao <input name="oxygenSaturation" id="emergencyOxygenInput" placeholder="%" /></label>
+              <label>Temperatura <input name="temperature" id="emergencyTemperatureInput" placeholder="C" /></label>
+              <label class="span-2">Queixa principal <textarea name="chiefComplaint" id="emergencyComplaintInput" rows="2" required placeholder="Motivo do atendimento imediato"></textarea></label>
+              <label class="span-2">Observacoes clinicas <textarea name="clinicalIndication" id="emergencyClinicalInput" rows="2" placeholder="Sintomas, pedido, orientacoes e riscos percebidos"></textarea></label>
+              <div class="action-row span-2">
+                <button type="submit">Abrir atendimento</button>
+                <button class="secondary" type="button" id="emergencyResetButton">Limpar</button>
+              </div>
+            </form>
+            <div class="summary-grid" id="emergencySummary"></div>
+            <div class="panel">
+              <div class="panel-heading">
+                <h2>Fila do Pronto Atendimento</h2>
+                <div class="action-row">
+                  <label>Display <select id="emergencyCounterSelect"></select></label>
+                  <span class="badge" id="emergencyQueueCount">0 ativos</span>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Prioridade</th>
+                      <th>Chegada</th>
+                      <th>Paciente</th>
+                      <th>Procedimento</th>
+                      <th>Etapa</th>
+                      <th>Sala</th>
+                      <th>Medico</th>
+                      <th>Acoes</th>
+                    </tr>
+                  </thead>
+                  <tbody id="emergencyQueueTable"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="workbench">
+            <form class="panel form-grid" id="patientForm" data-subview="patients">
+              <div class="panel-heading"><h2>Novo paciente</h2></div>
+              <label>Nome completo <input name="fullName" required /></label>
+              <label>Nascimento <input name="birthDate" type="date" /></label>
+              <label>Documento <input name="documentNumber" /></label>
+              <label>Sexo
+                <select name="sex">
+                  <option value="">Nao informado</option>
+                  <option value="F">Feminino</option>
+                  <option value="M">Masculino</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </label>
+              <label>Telefone <input name="phone" /></label>
+              <label>E-mail <input name="email" type="email" /></label>
+              <label>Responsavel <input name="guardianName" /></label>
+              <label class="span-2">Endereco <input name="address" /></label>
+              <button type="submit">Salvar paciente</button>
+            </form>
+            <form class="panel form-grid" id="appointmentForm" data-subview="appointments">
+              <div class="panel-heading"><h2>Novo atendimento</h2></div>
+              <div class="appointment-rule-preview span-2" id="appointmentRulePreview"></div>
+              <label>Paciente <select name="patientId" id="appointmentPatientSelect" required></select></label>
+              <label>Medico <select name="professionalId" id="appointmentDoctorSelect" required></select></label>
+              <label>Procedimento <select name="procedureName" id="appointmentProcedureSelect"></select></label>
+              <label>Filial <select name="branchName" id="appointmentBranchSelect"></select></label>
+              <label>Unidade <select name="unitName" id="appointmentUnitSelect"></select></label>
+              <label>Sala <select name="roomName" id="appointmentRoomSelect"></select></label>
+              <label>Convênio <select name="insuranceName" id="appointmentInsuranceSelect"></select></label>
+              <label>Plano <select name="planName" id="appointmentPlanSelect"></select></label>
+              <label>Carteirinha <input name="memberId" id="appointmentMemberInput" /></label>
+              <label>Guia <input name="guideNumber" id="appointmentGuideInput" /></label>
+              <label>Tipo
+                <select name="attendanceType">
+                  <option value="scheduled">Agendado</option>
+                  <option value="walk_in">Encaixe</option>
+                  <option value="return">Retorno</option>
+                </select>
+              </label>
+              <label>Inicio <input name="startsAt" id="appointmentStartsAtInput" type="datetime-local" required /></label>
+              <label>Fim <input name="endsAt" id="appointmentEndsAtInput" type="datetime-local" required /></label>
+              <label class="span-2">Pedido médico / observações <textarea name="orderSummary" rows="3" placeholder="Procedimento solicitado, hipótese, preparo, anexos recebidos"></textarea></label>
+              <button type="submit">Agendar</button>
+            </form>
+          </div>
+          <div class="panel" data-subview="appointments">
+            <div class="panel-heading"><h2>Atendimentos</h2></div>
+            <div class="list" id="appointmentsList"></div>
+          </div>
+          <div class="appointment-detail-page" data-subview="detail">
+            <div class="panel">
+              <div class="detail-header">
+                <div>
+                  <p class="eyebrow">Detalhe do atendimento</p>
+                  <h2 id="appointmentDetailTitle">Atendimento</h2>
+                </div>
+                <div class="action-row">
+                  <span class="badge" id="appointmentDetailStatus">status</span>
+                  <a class="button-link secondary-link" href="#attendance-frontdesk">Voltar</a>
+                </div>
+              </div>
+              <div class="detail-tabs" id="appointmentDetailTabs">
+                <button type="button" class="active" data-detail-tab="attendance">Atendimento</button>
+                <button type="button" data-detail-tab="patient">Paciente</button>
+                <button type="button" data-detail-tab="finance">Financeiro</button>
+                <button type="button" data-detail-tab="tiss">TISS</button>
+                <button type="button" data-detail-tab="material">Material</button>
+                <button type="button" data-detail-tab="documents">Documento</button>
+                <button type="button" data-detail-tab="report">Laudo</button>
+                <button type="button" data-detail-tab="notes">Observacoes</button>
+                <button type="button" data-detail-tab="honorary">Honorario medico</button>
+                <button type="button" data-detail-tab="associated">Associar procedimento</button>
+              </div>
+            </div>
+
+            <div id="appointmentDetailContent"></div>
+          </div>
+          <div class="panel" data-subview="totem">
+            <div class="panel-heading">
+              <h2>Totem de atendimento</h2>
+              <span class="badge" id="totemWaitingCount">0 aguardando</span>
+            </div>
+            <div class="summary-grid" id="totemSummary"></div>
+            <div class="totem-display" id="totemDisplayPanel"></div>
+            <form class="panel form-grid inline-form" id="totemDisplayConfigForm">
+              <div class="panel-heading"><h2>Conteúdo do display</h2></div>
+              <label>Título <input name="contentTitle" id="totemDisplayTitleInput" placeholder="Conteúdo institucional" /></label>
+              <label>URL online <input name="contentUrl" id="totemDisplayUrlInput" placeholder="https://www.youtube.com/watch?v=..." /></label>
+              <label>Tipo
+                <select name="contentType" id="totemDisplayTypeSelect">
+                  <option value="online">Online / YouTube</option>
+                  <option value="none">Sem mídia</option>
+                </select>
+              </label>
+              <label>Layout
+                <select name="layout" id="totemDisplayLayoutSelect">
+                  <option value="media_left">Mídia à esquerda</option>
+                  <option value="media_right">Mídia à direita</option>
+                </select>
+              </label>
+              <button type="submit">Salvar display</button>
+            </form>
+            <div class="workbench">
+              <form class="panel form-grid" id="totemTicketForm">
+                <div class="panel-heading"><h2>Emitir senha</h2></div>
+                <label>Fila <select name="queueId" id="totemQueueSelect" required></select></label>
+                <label>Prioridade
+                  <select name="priority">
+                    <option value="normal">Normal</option>
+                    <option value="preferential">Preferencial</option>
+                    <option value="elderly">Idoso</option>
+                    <option value="emergency">Emergencia</option>
+                  </select>
+                </label>
+                <label>Paciente <input name="patientName" placeholder="Nome ou identificação" /></label>
+                <label>Documento <input name="documentNumber" placeholder="CPF, pedido ou protocolo" /></label>
+                <button type="submit">Emitir senha</button>
+              </form>
+              <form class="panel form-grid" id="totemCallForm">
+                <div class="panel-heading"><h2>Chamar próxima senha</h2></div>
+                <label>Fila <select name="queueId" id="totemCallQueueSelect"></select></label>
+                <label>Guichê <select name="counterId" id="totemCounterSelect" required></select></label>
+                <button type="submit">Chamar no display</button>
+              </form>
+            </div>
+            <div class="split">
+              <div class="panel">
+                <div class="panel-heading"><h2>Fila de senhas</h2></div>
+                <div class="list" id="totemTicketsList"></div>
+              </div>
+              <div class="panel">
+                <div class="panel-heading"><h2>Auditoria do totem</h2></div>
+                <div class="list" id="totemAuditList"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="imaging" class="section" data-title="Central de Laudos">
+          <div class="summary-grid" id="imagingSummary" data-subview="overview"></div>
+          <div class="panel" data-subview="reports">
+            <div class="panel-heading"><h2>Laudos</h2></div>
+            <div class="empty-state">Laudos ficam isolados nesta subpagina e serao detalhados no ciclo de Imagem.</div>
+          </div>
+        </section>
+
+        <section id="laboratory" class="section" data-title="Laboratório">
+          <div class="workbench">
+            <form class="panel form-grid" id="supportLabForm" data-subview="support">
+              <div class="panel-heading"><h2>Laboratório de apoio</h2></div>
+              <label>Laboratório <input name="supportLabName" required /></label>
+              <label>Protocolo externo <input name="externalProtocol" /></label>
+              <label>Paciente <input name="patientName" /></label>
+              <label>Exame <input name="examName" /></label>
+              <button type="submit" data-permission="support_lab_receive">Receber exame</button>
+            </form>
+          </div>
+          <div class="split">
+            <div class="panel" data-subview="support"><div class="panel-heading"><h2>Apoio</h2></div><div class="list" id="supportLabList"></div></div>
+            <div class="panel" data-subview="orders"><div class="panel-heading"><h2>Pedidos e coletas</h2></div><div class="list" id="laboratoryOrdersList"></div></div>
+          </div>
+        </section>
+
+        <section id="billing" class="section" data-title="Faturamento">
+          <div class="workbench">
+            <form class="panel form-grid" id="invoiceForm" data-subview="invoices">
+              <div class="panel-heading"><h2>Nova fatura</h2></div>
+              <label>Paciente <select name="patientId" id="invoicePatientSelect" required></select></label>
+              <label>Pagador <select name="payerType"><option value="private">Particular</option><option value="insurance">Convenio</option></select></label>
+              <label>Valor <input name="amount" type="number" step="0.01" min="0" required /></label>
+              <button type="submit">Gerar fatura</button>
+            </form>
+            <form class="panel form-grid" id="billingBatchForm" data-subview="batches">
+              <div class="panel-heading"><h2>Lote convenio</h2></div>
+              <label>Titulo <input name="title" value="Lote convenio" /></label>
+              <button type="submit" data-permission="billing_batches">Gerar lote</button>
+            </form>
+          </div>
+          <div class="panel" data-subview="invoices batches denials payouts"><div class="panel-heading"><h2 id="billingListTitle">Faturamento</h2></div><div class="list" id="billingList"></div></div>
+        </section>
+
+        <section id="finance" class="section" data-title="Financeiro">
+          <div class="summary-grid" id="financeSummary" data-subview="overview"></div>
+          <form class="panel form-grid inline-form" id="financeForm" data-subview="cash">
+            <label>Direcao <select name="direction"><option value="receivable">A receber</option><option value="payable">A pagar</option></select></label>
+            <label>Descricao <input name="description" required /></label>
+            <label>Valor <input name="amount" type="number" step="0.01" min="0" required /></label>
+            <label>Vencimento <input name="dueDate" type="date" required /></label>
+            <label>Categoria <select name="category" id="financeCategorySelect"></select></label>
+            <label>Centro de custo <select name="costCenter" id="financeCostCenterSelect"></select></label>
+            <label>Conta/caixa <select name="cashAccount" id="financeAccountSelect"></select></label>
+            <label>Forma <select name="paymentMethod" id="financePaymentMethodSelect"></select></label>
+            <label>Competencia <input name="competenceMonth" type="month" /></label>
+            <label>Observacao <input name="notes" /></label>
+            <button type="submit">Adicionar movimento</button>
+          </form>
+          <div class="panel" data-subview="receivables payables reconciliation">
+            <div class="panel-heading">
+              <h2>Filtros</h2>
+              <span class="badge" id="financeCount">0 movimentos</span>
+            </div>
+            <div class="filter-row">
+              <input id="financeSearch" placeholder="Buscar por descricao, categoria ou origem" />
+              <select id="financeDirectionFilter">
+                <option value="">Todas as direcoes</option>
+                <option value="receivable">A receber</option>
+                <option value="payable">A pagar</option>
+              </select>
+              <select id="financeStatusFilter">
+                <option value="">Todos os status</option>
+                <option value="open">Aberto</option>
+                <option value="paid">Pago</option>
+                <option value="cancelled">Cancelado</option>
+              </select>
+              <select id="financeReconciliationFilter">
+                <option value="">Toda conciliação</option>
+                <option value="pending">Pendente</option>
+                <option value="reconciled">Conciliado</option>
+                <option value="divergent">Divergente</option>
+              </select>
+            </div>
+          </div>
+          <div class="finance-columns">
+            <div class="panel" data-subview="receivables"><div class="panel-heading"><h2>A receber</h2><span class="badge" id="financeReceivablesCount">0</span></div><div class="list" id="financeReceivablesList"></div></div>
+            <div class="panel" data-subview="payables"><div class="panel-heading"><h2>A pagar</h2><span class="badge" id="financePayablesCount">0</span></div><div class="list" id="financePayablesList"></div></div>
+            <div class="panel"><div class="panel-heading"><h2>Conciliação</h2><span class="badge" id="financeReconciliationCount">0</span></div><div class="list" id="financeReconciliationList"></div></div>
+          </div>
+        </section>
+
+        <section id="relationship" class="section" data-title="Relacionamento">
+          <div class="workbench" data-subview="ura">
+            <form class="panel form-grid" id="relationshipCallForm">
+              <div class="panel-heading"><h2>Simular URA</h2></div>
+              <label>Telefone <input name="originPhone" value="+55 62 99999-0000" /></label>
+              <label>Paciente <input name="patientName" placeholder="Nome do paciente" /></label>
+              <label>Opção URA <select name="dtmf" id="relationshipDtmfSelect"></select></label>
+              <label>Motivo <input name="reason" placeholder="Agendamento, resultado, financeiro..." /></label>
+              <button type="submit">Processar chamada</button>
+            </form>
+            <div class="panel">
+              <div class="panel-heading"><h2>Filas URA</h2><span class="badge" id="relationshipQueuesCount">0 filas</span></div>
+              <div class="list" id="relationshipQueuesList"></div>
+            </div>
+          </div>
+          <div class="panel" data-subview="ura">
+            <div class="panel-heading"><h2>Chamadas e sugestão do agente</h2><span class="badge" id="relationshipCallsCount">0 chamadas</span></div>
+            <div class="list" id="relationshipCallsList"></div>
+          </div>
+          <div class="workbench" data-subview="ura">
+            <form class="panel form-grid" id="uraConfigForm">
+              <div class="panel-heading"><h2>Configuracao tecnica</h2><span class="badge" id="uraConfigStatus">Homologacao</span></div>
+              <label>Provedor <select name="provider"><option value="asterisk-ari">Asterisk ARI</option><option value="twilio">Twilio</option><option value="zenvia">Zenvia</option><option value="custom">Personalizado</option></select></label>
+              <label>ARI base URL <input name="ariBaseUrl" placeholder="http://127.0.0.1:8088/ari" /></label>
+              <label>Aplicacao ARI <input name="ariApplication" placeholder="clinic-relationship" /></label>
+              <label>Usuario ARI <input name="ariUsername" placeholder="clinic_ari" /></label>
+              <label>Senha ARI <input name="ariPassword" type="password" placeholder="manter atual se vazio" /></label>
+              <label>Tronco SIP <input name="sipTrunk" placeholder="SIP/tronco-principal" /></label>
+              <label>DID entrada <input name="inboundDid" placeholder="0800-000-0000" /></label>
+              <label>Segredo webhook <input name="webhookSecret" placeholder="segredo para eventos externos" /></label>
+              <label>Audio saudacao <input name="greetingMedia" placeholder="sound:demo-congrats" /></label>
+              <label>Formato gravacao <input name="recordingFormat" placeholder="wav" /></label>
+              <label>Horario atendimento <input name="businessHours" placeholder="Seg-Sex 07:00-19:00" /></label>
+              <label>Fila fallback <select name="fallbackQueue" id="uraFallbackQueueSelect"></select></label>
+              <label>Auto atender <select name="autoAnswerEnabled"><option value="false">Nao</option><option value="true">Sim</option></select></label>
+              <label>Auto transferir <select name="autoTransferEnabled"><option value="false">Nao</option><option value="true">Sim</option></select></label>
+              <label>Gravar chamadas <select name="recordingEnabled"><option value="true">Sim</option><option value="false">Nao</option></select></label>
+              <label>Transcrever <select name="transcriptionEnabled"><option value="false">Nao</option><option value="true">Sim</option></select></label>
+              <label>Status <select name="status"><option value="homologation">Homologacao</option><option value="production">Producao</option><option value="inactive">Inativo</option></select></label>
+              <button type="submit">Salvar configuracao</button>
+            </form>
+            <div class="panel">
+              <div class="panel-heading"><h2>Conector ARI real</h2><span class="badge" id="uraConnectorStatus">Desconectado</span></div>
+              <div class="list compact-list" id="uraConnectorDetails"></div>
+              <div class="action-row">
+                <button type="button" id="uraConnectorTestButton">Testar ARI</button>
+                <button type="button" id="uraConnectorConnectButton">Conectar eventos</button>
+                <button type="button" id="uraConnectorDisconnectButton">Desconectar</button>
+              </div>
+            </div>
+            <form class="panel form-grid" id="uraFlowForm">
+              <div class="panel-heading"><h2>Fluxo URA</h2></div>
+              <label>Nome <input name="name" value="Fluxo principal" /></label>
+              <label>Saudacao <input name="greetingText" value="Bem-vindo. Escolha uma opcao para continuar." /></label>
+              <label>Timeout seg. <input name="timeoutSeconds" type="number" min="1" value="8" /></label>
+              <label>Tentativas <input name="maxRetries" type="number" min="1" value="2" /></label>
+              <label>DTMF <input name="optionDtmf" value="1" maxlength="2" /></label>
+              <label>Nome da opcao <input name="optionLabel" value="Agendamento" /></label>
+              <label>Fila destino <select name="targetQueueId" id="uraFlowQueueSelect"></select></label>
+              <label>Mensagem <input name="message" value="Transferir para a fila escolhida." /></label>
+              <button type="submit">Criar fluxo</button>
+            </form>
+          </div>
+          <div class="workbench" data-subview="ura">
+            <form class="panel form-grid" id="uraLiveCallForm">
+              <div class="panel-heading"><h2>Chamada ao vivo</h2></div>
+              <label>Telefone <input name="originPhone" value="+55 62 98888-0000" /></label>
+              <label>Paciente <input name="patientName" placeholder="Nome do paciente" /></label>
+              <label>DTMF <select name="dtmf" id="uraLiveDtmfSelect"></select></label>
+              <label>Motivo <input name="reason" placeholder="Quero agendar um exame" /></label>
+              <button type="submit">Simular evento ARI</button>
+            </form>
+            <div class="panel">
+              <div class="panel-heading"><h2>Fluxos cadastrados</h2><span class="badge" id="uraFlowsCount">0</span></div>
+              <div class="list" id="uraFlowsList"></div>
+            </div>
+          </div>
+          <div class="workbench" data-subview="ura">
+            <form class="panel form-grid" id="uraProviderEventForm">
+              <div class="panel-heading"><h2>Evento do provedor</h2></div>
+              <label>Evento <select name="eventType"><option value="channel_started">Inicio canal</option><option value="call_answered">Atendida</option><option value="dtmf_received">DTMF recebido</option><option value="bridge_entered">Entrou na ponte</option><option value="transfer_completed">Transferida</option><option value="hangup">Desligada</option></select></label>
+              <label>Canal <input name="channelId" placeholder="SIP/99881111-123" /></label>
+              <label>Telefone <input name="originPhone" value="+55 62 97777-0000" /></label>
+              <label>Paciente <input name="patientName" placeholder="Nome do paciente" /></label>
+              <label>DTMF <select name="dtmf" id="uraProviderEventDtmfSelect"></select></label>
+              <label>Motivo <input name="reason" placeholder="Resultado de exame" /></label>
+              <button type="submit">Receber evento</button>
+            </form>
+            <div class="panel">
+              <div class="panel-heading"><h2>Prontidao operacional</h2></div>
+              <div class="summary-grid" id="uraReadinessSummary"></div>
+            </div>
+          </div>
+          <div class="workbench" data-subview="ura">
+            <form class="panel form-grid" id="uraCommandForm">
+              <div class="panel-heading"><h2>Comandos ARI</h2></div>
+              <label>Acao <select name="action"><option value="answer">Atender</option><option value="play">Tocar audio</option><option value="transfer">Transferir</option><option value="record">Gravar</option><option value="hangup">Desligar</option></select></label>
+              <label>Chamada <select name="liveCallId" id="uraCommandLiveCallSelect"></select></label>
+              <label>Canal manual <input name="channelId" placeholder="SIP/ARI-REAL-001" /></label>
+              <label>Audio <input name="media" placeholder="sound:demo-congrats" /></label>
+              <label>Fila <select name="queueId" id="uraCommandQueueSelect"></select></label>
+              <label>Destino manual <input name="transferTarget" placeholder="PJSIP/fila-atendimento" /></label>
+              <button type="submit">Executar comando</button>
+            </form>
+            <div class="panel">
+              <div class="panel-heading"><h2>Comandos recentes</h2><span class="badge" id="uraCommandsCount">0</span></div>
+              <div class="list" id="uraCommandsList"></div>
+            </div>
+          </div>
+          <div class="workbench" data-subview="ura">
+            <div class="panel">
+              <div class="panel-heading"><h2>Chamadas tecnicas</h2><span class="badge" id="uraLiveCallsCount">0</span></div>
+              <div class="list" id="uraLiveCallsList"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-heading"><h2>Eventos recebidos</h2><span class="badge" id="uraEventsCount">0</span></div>
+              <div class="list" id="uraEventsList"></div>
+            </div>
+          </div>
+          <div class="panel" data-subview="ura">
+              <div class="panel-heading"><h2>Auditoria URA</h2><span class="badge" id="uraAuditCount">0</span></div>
+              <div class="list" id="uraAuditList"></div>
+          </div>
+          <div class="panel" data-subview="whatsapp">
+            <div class="panel-heading"><h2>WhatsApp autonomo</h2><span class="badge" id="whatsappStatus">Homologacao</span></div>
+            <form class="form-grid" id="whatsappConfigForm">
+              <label>Provedor <select name="provider"><option value="evolution-api">Evolution API</option><option value="cloud-api">Meta Cloud API</option><option value="baileys">Baileys direto</option><option value="simulation">Simulacao local</option></select></label>
+              <label>Cloud phone ID <input name="cloudPhoneNumberId" placeholder="Meta phone number id" /></label>
+              <label>Cloud token <input name="cloudAccessToken" type="password" placeholder="manter atual se vazio" /></label>
+              <label>Verify token <input name="verifyToken" placeholder="clinic-whatsapp-verify" /></label>
+              <label>Graph version <input name="cloudGraphVersion" placeholder="v23.0" /></label>
+              <label>Evolution URL <input name="evolutionBaseUrl" placeholder="http://127.0.0.1:8080" /></label>
+              <label>Instancia <input name="evolutionInstance" placeholder="clinic-main" /></label>
+              <label>Evolution API key <input name="evolutionApiKey" type="password" placeholder="manter atual se vazio" /></label>
+              <label>Webhook secret <input name="webhookSecret" placeholder="clinic-whatsapp-local-secret" /></label>
+              <label>Modo do agente <select name="agentMode"><option value="automatic">Automatico</option><option value="supervised">Supervisionado</option><option value="manual">Manual</option></select></label>
+              <label>Responder sozinho <select name="autoReplyEnabled"><option value="true">Sim</option><option value="false">Nao</option></select></label>
+              <label>Enviar automaticamente <select name="autoSendEnabled"><option value="true">Sim</option><option value="false">Nao</option></select></label>
+              <label>Agendar sozinho <select name="autoScheduleEnabled"><option value="true">Sim</option><option value="false">Nao</option></select></label>
+              <label>Cancelar sozinho <select name="autoCancelEnabled"><option value="true">Sim</option><option value="false">Nao</option></select></label>
+              <label>Ler pedido por foto <select name="autoOrderReadingEnabled"><option value="true">Sim</option><option value="false">Nao</option></select></label>
+              <label>Motor OCR <select name="ocrEngine"><option value="tesseract-cli">Tesseract local</option><option value="external">Externo/webhook</option></select></label>
+              <label>Idioma OCR <input name="ocrLanguage" placeholder="por+eng" /></label>
+              <label>Revisar baixa confianca <select name="requireHumanReviewForLowConfidence"><option value="true">Sim</option><option value="false">Nao</option></select></label>
+              <label>Confianca minima <input name="minimumConfidence" type="number" min="0" max="1" step="0.01" /></label>
+              <label>Tentativas de envio <input name="retryLimit" type="number" min="0" max="10" step="1" /></label>
+              <label>Status <select name="status"><option value="homologation">Homologacao</option><option value="production">Producao</option><option value="inactive">Inativo</option></select></label>
+              <button type="submit">Salvar WhatsApp</button>
+            </form>
+          </div>
+          <div class="workbench" data-subview="whatsapp">
+            <form class="panel form-grid" id="whatsappSimulationForm">
+              <div class="panel-heading"><h2>Simular atendimento</h2></div>
+              <label>Telefone <input name="fromPhone" value="+55 62 99999-1234" /></label>
+              <label>Paciente <input name="contactName" value="Paciente WhatsApp" /></label>
+              <label>Tipo <select name="messageType"><option value="text">Texto</option><option value="image">Foto do pedido</option><option value="document">Documento</option></select></label>
+              <label>Mensagem <input name="text" value="Quero agendar uma tomografia" /></label>
+              <label>Legenda <input name="caption" placeholder="Pedido medico enviado por foto" /></label>
+              <label>Texto extraido/OCR <input name="extractedText" placeholder="Paciente: Maria Silva Procedimento: Tomografia Medico: Dr Joao" /></label>
+              <label>Midia URL <input name="mediaUrl" placeholder="https://..." /></label>
+              <button type="submit">Processar conversa</button>
+            </form>
+            <div class="panel">
+              <div class="panel-heading"><h2>Prontidao WhatsApp</h2></div>
+              <div class="summary-grid" id="whatsappReadinessSummary"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-heading"><h2>Segurança do agente</h2></div>
+              <div class="summary-grid" id="whatsappSafetySummary"></div>
+              <div class="list compact-list" id="whatsappSafetyExecutive"></div>
+              <div class="workbench">
+                <div>
+                  <div class="inbox-column-heading">Motivos de intervencao</div>
+                  <div class="list" id="whatsappSafetyReasonsList"></div>
+                </div>
+                <div>
+                  <div class="inbox-column-heading">Riscos de entrega</div>
+                  <div class="list" id="whatsappSafetyDeliveryList"></div>
+                </div>
+                <div>
+                  <div class="inbox-column-heading">Eventos recentes</div>
+                  <div class="list" id="whatsappSafetyRecentList"></div>
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-heading"><h2>Conector Evolution API</h2><span class="badge" id="whatsappEvolutionStatus">Offline</span></div>
+              <div class="summary-grid" id="whatsappEvolutionSummary"></div>
+              <div class="action-row">
+                <button type="button" id="whatsappEvolutionRefreshButton">Testar API</button>
+                <button type="button" id="whatsappEvolutionCreateButton">Criar instancia</button>
+                <button type="button" id="whatsappEvolutionConnectButton">Conectar</button>
+              </div>
+              <label>Telefone para pareamento <input id="whatsappEvolutionNumberInput" placeholder="5562999999999" /></label>
+              <div class="list" id="whatsappEvolutionQr"></div>
+            </div>
+          </div>
+          <div class="panel whatsapp-inbox" data-subview="whatsapp">
+            <div class="panel-heading"><h2>Inbox de atendimento</h2><span class="badge" id="whatsappInboxStatus">Sem conversa</span></div>
+            <div class="whatsapp-inbox-layout">
+              <div class="inbox-column">
+                <div class="inbox-column-heading">Conversas</div>
+                <div class="list inbox-thread-list" id="whatsappInboxConversations"></div>
+              </div>
+              <div class="inbox-column inbox-history-column">
+                <div class="inbox-column-heading" id="whatsappInboxTitle">Historico</div>
+                <div class="whatsapp-message-list" id="whatsappInboxMessages"></div>
+                <form class="inbox-reply-form" id="whatsappInboxReplyForm">
+                  <input type="hidden" name="conversationId" id="whatsappInboxConversationInput" />
+                  <textarea name="text" id="whatsappInboxReplyText" rows="3" placeholder="Responder ao paciente"></textarea>
+                  <button type="submit">Enviar resposta</button>
+                </form>
+              </div>
+              <aside class="inbox-column">
+                <div class="inbox-column-heading">Contexto</div>
+                <div class="list" id="whatsappInboxContext"></div>
+              </aside>
+            </div>
+          </div>
+          <div class="workbench" data-subview="whatsapp">
+            <div class="panel">
+              <div class="panel-heading"><h2>Supervisao do agente</h2></div>
+              <div class="summary-grid" id="whatsappSupervisionSummary"></div>
+              <div class="list" id="whatsappSupervisionList"></div>
+            </div>
+            <form class="panel form-grid" id="whatsappManualReplyForm">
+              <div class="panel-heading"><h2>Resposta manual</h2></div>
+              <label>Conversa <select name="conversationId" id="whatsappManualConversationSelect"></select></label>
+              <label>Mensagem <input name="text" id="whatsappManualTextInput" placeholder="Digite a resposta para o paciente" /></label>
+              <button type="submit">Enviar resposta</button>
+            </form>
+          </div>
+          <div class="panel" data-subview="whatsapp">
+            <div class="panel-heading"><h2>Fila de excecoes</h2></div>
+            <div class="summary-grid" id="whatsappExceptionsSummary"></div>
+            <div class="list" id="whatsappExceptionsList"></div>
+          </div>
+          <div class="panel" data-subview="whatsapp">
+            <div class="panel-heading"><h2>Aprovacao operacional das regras</h2></div>
+            <div class="summary-grid" id="whatsappAutonomyReviewsSummary"></div>
+            <div class="list" id="whatsappAutonomyReviewsList"></div>
+          </div>
+          <div class="panel" data-subview="whatsapp">
+            <div class="panel-heading"><h2>Pendencias cadastrais</h2><span class="badge" id="whatsappProfileUpdatesCount">0</span></div>
+            <div class="list" id="whatsappProfileUpdatesList"></div>
+          </div>
+          <div class="panel" data-subview="whatsapp">
+            <div class="panel-heading"><h2>Consentimentos LGPD</h2><span class="badge" id="whatsappConsentsCount">0</span></div>
+            <div class="list" id="whatsappConsentsList"></div>
+          </div>
+          <div class="workbench" data-subview="whatsapp">
+            <form class="panel form-grid" id="whatsappFlowForm">
+              <div class="panel-heading"><h2>Fluxos do agente</h2></div>
+              <label>Nome <input name="name" placeholder="Preparo de tomografia" /></label>
+              <label>Intencao <select name="intent"><option value="schedule">Agendamento</option><option value="cancel">Cancelamento</option><option value="order_photo">Pedido por foto</option><option value="exam_prep">Preparo</option><option value="human">Atendente</option><option value="location">Endereco/horarios</option><option value="triage">Triagem</option></select></label>
+              <label>Acao <select name="action"><option value="info">Informar</option><option value="clarify">Pedir dados</option><option value="schedule">Agendar</option><option value="cancel">Cancelar</option><option value="order">Pedido/OCR</option><option value="human">Atendente</option></select></label>
+              <label>Palavras-chave <input name="keywords" placeholder="preparo, jejum, contraste" /></label>
+              <label>Resposta <input name="responseTemplate" placeholder="Mensagem com {{nome}}, {{procedimento}}, {{data}} ou {{telefone}}" /></label>
+              <label>Aprovacao <select name="requiresApproval"><option value="false">Nao</option><option value="true">Sim</option></select></label>
+              <label>Prioridade <input name="priority" type="number" min="0" max="100" value="10" /></label>
+              <label>Status <select name="status"><option value="active">Ativo</option><option value="inactive">Inativo</option></select></label>
+              <button type="submit">Criar fluxo</button>
+            </form>
+            <div class="panel">
+              <div class="panel-heading"><h2>Fluxos configurados</h2><span class="badge" id="whatsappFlowsCount">0</span></div>
+              <div class="list" id="whatsappFlowsList"></div>
+            </div>
+          </div>
+          <div class="workbench" data-subview="whatsapp">
+            <form class="panel form-grid" id="whatsappTemplateForm">
+              <div class="panel-heading"><h2>Templates oficiais</h2></div>
+              <label>Nome <input name="name" placeholder="Confirmacao de agendamento" /></label>
+              <label>Categoria <select name="category"><option value="agendamento">Agendamento</option><option value="preparo">Preparo</option><option value="lgpd">LGPD</option><option value="convenio">Convenio</option><option value="cancelamento">Cancelamento</option><option value="humano">Humano</option><option value="lembrete">Lembrete</option><option value="geral">Geral</option></select></label>
+              <label>Gatilho <input name="trigger" placeholder="appointment_scheduled" /></label>
+              <label>Texto <textarea name="body" rows="5" placeholder="Mensagem com {{nome}}, {{procedimento}}, {{data}}, {{sala}}"></textarea></label>
+              <label>Variaveis <input name="variables" placeholder="nome, procedimento, data" /></label>
+              <label>Aprovacao <select name="requiresApproval"><option value="false">Nao</option><option value="true">Sim</option></select></label>
+              <label>Prioridade <input name="priority" type="number" min="0" max="100" value="10" /></label>
+              <label>Status <select name="status"><option value="active">Ativo</option><option value="inactive">Inativo</option></select></label>
+              <button type="submit">Criar template</button>
+            </form>
+            <div class="panel">
+              <div class="panel-heading"><h2>Biblioteca de templates</h2><span class="badge" id="whatsappTemplatesCount">0</span></div>
+              <div class="list" id="whatsappTemplatesList"></div>
+            </div>
+          </div>
+          <div class="workbench" data-subview="whatsapp">
+            <form class="panel form-grid" id="whatsappAutonomyRuleForm">
+              <div class="panel-heading"><h2>Regras de autonomia</h2></div>
+              <label>Nome <input name="name" placeholder="Cancelamento no mesmo dia exige recepção" /></label>
+              <label>Condicao <select name="condition"><option value="sensitive_words">Termos sensiveis</option><option value="identity_unconfirmed">Identidade nao confirmada</option><option value="low_ocr_confidence">OCR baixa confianca</option><option value="authorization_required">Autorizacao pendente</option><option value="same_day_cancel">Cancelamento no dia</option><option value="lgpd_rejected">LGPD recusado</option><option value="private_schedule">Particular</option></select></label>
+              <label>Acao <select name="action"><option value="human_review">Revisao humana</option><option value="require_approval">Exigir aprovacao</option><option value="allow">Permitir</option><option value="block">Bloquear</option></select></label>
+              <label>Aplicar em <input name="appliesTo" value="message,schedule,cancel,order_photo" /></label>
+              <label>Gravidade <select name="severity"><option value="medium">Media</option><option value="high">Alta</option><option value="low">Baixa</option></select></label>
+              <label>Limite <input name="threshold" placeholder="0.72" /></label>
+              <label>Palavras-chave <input name="keywords" placeholder="reclamacao, processo, urgencia" /></label>
+              <label>Prioridade <input name="priority" type="number" min="0" max="100" value="10" /></label>
+              <label>Status <select name="status"><option value="active">Ativo</option><option value="inactive">Inativo</option></select></label>
+              <button type="submit">Criar regra</button>
+            </form>
+            <div class="panel">
+              <div class="panel-heading"><h2>Politica do agente</h2><span class="badge" id="whatsappAutonomyRulesCount">0</span></div>
+              <div class="list" id="whatsappAutonomyRulesList"></div>
+            </div>
+          </div>
+          <div class="workbench" data-subview="whatsapp">
+            <form class="panel form-grid" id="whatsappAutonomyProfileForm">
+              <div class="panel-heading"><h2>Perfis de autonomia</h2></div>
+              <label>Nome <input name="name" placeholder="Agendamento por convenio supervisionado" /></label>
+              <label>Escopo <select name="scope"><option value="private_schedule">Agendamento particular</option><option value="insurance_schedule">Agendamento convenio</option><option value="cancel">Cancelamento</option><option value="order_photo">Pedido por foto</option><option value="critical_relationship">Relacionamento critico</option><option value="general">Geral</option></select></label>
+              <label>Modo <select name="mode"><option value="supervised">Supervisionado</option><option value="automatic">Automatico</option><option value="human">Humano</option></select></label>
+              <label>Acao <select name="action"><option value="require_approval">Exigir aprovacao</option><option value="human_review">Revisao humana</option><option value="allow">Permitir</option></select></label>
+              <label>Aplicar em <input name="appliesTo" value="schedule,order_photo,cancel,message" /></label>
+              <label>Tipo atendimento <select name="insuranceType"><option value="all">Todos</option><option value="private">Particular</option><option value="insurance">Convenio</option><option value="unknown">Nao informado</option></select></label>
+              <label>Palavras-chave <input name="keywords" placeholder="laudo errado, processo, reclamacao" /></label>
+              <label>Descricao <input name="description" placeholder="Como o agente deve se comportar neste cenario" /></label>
+              <label>Prioridade <input name="priority" type="number" min="0" max="100" value="10" /></label>
+              <label>Status <select name="status"><option value="active">Ativo</option><option value="inactive">Inativo</option></select></label>
+              <button type="submit">Criar perfil</button>
+            </form>
+            <div class="panel">
+              <div class="panel-heading"><h2>Perfis aplicados</h2><span class="badge" id="whatsappAutonomyProfilesCount">0</span></div>
+              <div class="list" id="whatsappAutonomyProfilesList"></div>
+            </div>
+          </div>
+          <div class="workbench" data-subview="whatsapp">
+            <form class="panel form-grid" id="whatsappJourneyForm">
+              <div class="panel-heading"><h2>Cascata de atendimento</h2></div>
+              <label>Nome <input name="name" placeholder="Cascata de autorização" /></label>
+              <label>Intencao <select name="intent"><option value="schedule">Agendamento</option><option value="cancel">Cancelamento</option><option value="order_photo">Pedido por foto</option><option value="human">Atendente</option><option value="triage">Triagem</option></select></label>
+              <label>Acoes gatilho <input name="triggerActions" placeholder="schedule, order, cancel" /></label>
+              <label>Descricao <input name="description" placeholder="Objetivo operacional da cascata" /></label>
+              <label>Etapas <textarea name="stepsText" rows="5" placeholder="Identificar paciente | collect_patient | Envie nome completo e data de nascimento&#10;Conferir pedido | collect_order | Envie o pedido ou nome do exame"></textarea></label>
+              <label>Prioridade <input name="priority" type="number" min="0" max="100" value="10" /></label>
+              <label>Status <select name="status"><option value="active">Ativo</option><option value="inactive">Inativo</option></select></label>
+              <button type="submit">Criar cascata</button>
+            </form>
+            <div class="panel">
+              <div class="panel-heading"><h2>Cascatas configuradas</h2><span class="badge" id="whatsappJourneysCount">0</span></div>
+              <div class="list" id="whatsappJourneysList"></div>
+            </div>
+          </div>
+          <div class="workbench" data-subview="whatsapp">
+            <form class="panel form-grid" id="whatsappAvailabilityForm">
+              <div class="panel-heading"><h2>Agenda assistida</h2></div>
+              <label>Procedimento <input name="procedureName" value="Tomografia" /></label>
+              <label>Data preferida <input name="preferredDate" type="date" /></label>
+              <label>Periodo <select name="preferredPeriod"><option value="">Qualquer</option><option value="manha">Manha</option><option value="tarde">Tarde</option><option value="noite">Noite</option></select></label>
+              <label>Limite <input name="limit" type="number" min="1" max="12" value="6" /></label>
+              <button type="submit">Buscar horarios</button>
+            </form>
+            <div class="panel">
+              <div class="panel-heading"><h2>Horarios livres</h2></div>
+              <div class="list" id="whatsappAvailabilityList"></div>
+            </div>
+          </div>
+          <div class="workbench" data-subview="whatsapp">
+            <form class="panel form-grid" id="whatsappInsuranceValidationForm">
+              <div class="panel-heading"><h2>Validacao de convenio</h2></div>
+              <label>Convenio <input name="insuranceName" value="Convenio Demo" /></label>
+              <label>Procedimento <input name="procedureName" value="Tomografia" /></label>
+              <label>Guia/Senha <input name="guideNumber" placeholder="Opcional" /></label>
+              <label>Autorizacao <input name="authorizationCode" placeholder="Opcional" /></label>
+              <button type="submit">Validar convenio</button>
+            </form>
+            <div class="panel">
+              <div class="panel-heading"><h2>Resultado da validacao</h2></div>
+              <div class="list" id="whatsappInsuranceValidationResult"></div>
+            </div>
+          </div>
+          <div class="workbench" data-subview="whatsapp">
+            <form class="panel form-grid" id="whatsappPrepRuleForm">
+              <div class="panel-heading"><h2>Preparo automatico</h2></div>
+              <label>Nome <input name="name" placeholder="Tomografia com contraste" /></label>
+              <label>Modalidade <select name="modality"><option value="CT">CT</option><option value="MR">MR</option><option value="US">US</option><option value="CR">CR</option><option value="MG">MG</option><option value="OT">Outro</option></select></label>
+              <label>Palavras-chave <input name="procedureKeywords" placeholder="tomografia, contraste" /></label>
+              <label>Instrucoes <textarea name="instructions" rows="4" placeholder="Jejum, contraste, alergias, medicamentos"></textarea></label>
+              <label>Documentos <textarea name="documents" rows="3" placeholder="Documento, pedido medico, carteirinha, guia"></textarea></label>
+              <label>Antecedencia min <input name="arrivalMinutes" type="number" min="0" max="180" value="20" /></label>
+              <label>Acompanhante <select name="requiresCompanion"><option value="false">Nao</option><option value="true">Sim</option></select></label>
+              <label>Prioridade <input name="priority" type="number" min="0" max="100" value="10" /></label>
+              <label>Status <select name="status"><option value="active">Ativo</option><option value="inactive">Inativo</option></select></label>
+              <button type="submit">Criar preparo</button>
+            </form>
+            <div class="panel">
+              <div class="panel-heading"><h2>Preparos configurados</h2><span class="badge" id="whatsappPrepRulesCount">0</span></div>
+              <div class="list" id="whatsappPrepRulesList"></div>
+            </div>
+          </div>
+          <div class="workbench" data-subview="whatsapp">
+            <div class="panel">
+              <div class="panel-heading"><h2>Conversas</h2><span class="badge" id="whatsappConversationsCount">0</span></div>
+              <div class="list" id="whatsappConversationsList"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-heading"><h2>Tarefas do agente</h2><span class="badge" id="whatsappTasksCount">0</span></div>
+              <div class="list" id="whatsappTasksList"></div>
+            </div>
+          </div>
+          <div class="workbench" data-subview="whatsapp">
+            <div class="panel">
+              <div class="panel-heading"><h2>OCR de pedidos</h2><span class="badge" id="whatsappOcrCount">0</span></div>
+              <div class="list" id="whatsappOcrList"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-heading"><h2>Mensagens</h2><span class="badge" id="whatsappMessagesCount">0</span></div>
+              <div class="list" id="whatsappMessagesList"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-heading"><h2>Saidas WhatsApp</h2><span class="badge" id="whatsappOutboxCount">0</span></div>
+              <div class="action-row">
+                <button type="button" id="whatsappSendPendingButton">Enviar pendentes</button>
+              </div>
+              <div class="list" id="whatsappOutboxList"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-heading"><h2>Auditoria WhatsApp</h2><span class="badge" id="whatsappAuditCount">0</span></div>
+              <div class="list" id="whatsappAuditList"></div>
+            </div>
+          </div>
+          <div class="panel" data-subview="legacy-whatsapp" hidden>
+            <div class="panel-heading"><h2>WhatsApp</h2></div>
+            <div class="empty-state">Central para conversas, confirmação de agenda, entrega de preparo e agente de resposta. A próxima etapa liga esta tela a um provedor local/API.</div>
+          </div>
+          <div class="panel" data-subview="reputation">
+            <div class="panel-heading"><h2>Reputação / Google</h2></div>
+            <div class="empty-state">Monitoramento de avaliações, classificação de sentimento e sugestão de resposta humanizada.</div>
+          </div>
+          <div class="panel" data-subview="social">
+            <div class="panel-heading"><h2>Redes sociais</h2></div>
+            <div class="empty-state">Fila de comentários, mensagens e respostas assistidas por agente.</div>
+          </div>
+          <div class="panel" data-subview="agent">
+            <div class="panel-heading"><h2>Agente de relacionamento</h2></div>
+            <div class="empty-state">Políticas de resposta natural, escalonamento humano e auditoria de publicações.</div>
+          </div>
+        </section>
+
+        <section id="security-users" class="section" data-title="Segurança">
+          <div class="workbench">
+            <div class="panel" data-subview="overview">
+              <div class="panel-heading"><h2>Riscos de acesso</h2></div>
+              <div class="summary-grid" id="securityRiskSummary"></div>
+            </div>
+            <form class="panel form-grid" id="userForm" data-subview="users">
+              <div class="panel-heading"><h2>Usuario</h2><span class="badge" id="usersCount">0</span></div>
+              <label>Nome <input name="name" required /></label>
+              <label>E-mail <input name="email" type="email" required /></label>
+              <label>Senha inicial <input name="password" type="password" minlength="6" required /></label>
+              <label>Vinculo <select name="professionalType" id="userProfessionalTypeSelect"><option value="">Sem vinculo</option><option value="employee">Colaborador</option><option value="doctor">Medico</option></select></label>
+              <label>Profissional <select name="professionalId" id="userProfessionalSelect"></select></label>
+              <label>Grupo <select name="userGroup" id="userGroupSelect"></select></label>
+              <label>Perfil <select name="role"><option value="frontdesk">Recepção</option><option value="billing">Faturamento</option><option value="doctor">Medico</option><option value="manager">Gestor</option><option value="admin">Administrador</option><option value="viewer">Leitura</option></select></label>
+              <label>Modulos <input name="modules" value="patients,appointments" /></label>
+              <div class="form-section-title">Permissoes operacionais</div>
+              <div class="permission-grid" id="userPermissionGrid"></div>
+              <button type="submit">Criar usuario</button>
+            </form>
+            <div class="panel" data-subview="users">
+              <div class="panel-heading"><h2>Usuarios</h2></div>
+              <div class="list" id="usersList"></div>
+            </div>
+            <div class="panel" data-subview="permissions">
+              <div class="panel-heading"><h2>Grupos e permissoes</h2></div>
+              <div class="list" id="securityPermissionsList"></div>
+            </div>
+            <div class="panel" data-subview="overview">
+              <div class="panel-heading"><h2>Auditoria de segurança</h2><span class="badge" id="securityAuditCount">0</span></div>
+              <div class="list" id="securityAuditList"></div>
+            </div>
+            <div class="panel" data-subview="system-state">
+              <div class="panel-heading">
+                <h2>Estado do sistema</h2>
+                <div class="action-row">
+                  <button class="secondary" type="button" id="systemStateRunButton">Executar diagnostico</button>
+                  <button class="secondary" type="button" id="systemStateHistoryButton">Ver historico de diagnosticos</button>
+                </div>
+              </div>
+              <div class="summary-grid" id="systemStateSummary"></div>
+              <div class="meta-row"><span id="systemStateLastRun">Sem diagnostico registrado</span></div>
+              <div class="list" id="systemStateChecks"></div>
+              <div class="list" id="systemStateHistoryList" hidden></div>
+            </div>
+            <div class="panel" data-subview="lgpd">
+              <div class="panel-heading"><h2>LGPD</h2></div>
+              <div class="empty-state">Consentimentos, acessos e exportações LGPD ficam isolados nesta subpagina.</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="human-resources" class="section" data-title="Recursos Humanos">
+          <div class="workbench">
+            <div class="panel">
+              <div class="panel-heading">
+                <h2>Colaboradores</h2>
+                <a class="button-link" href="#settings-registries" data-route="settings-registries">+ Adicionar</a>
+              </div>
+              <div class="hr-filter-bar">
+                <label>Mostrar
+                  <select id="hrPageSize">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                  </select>
+                  registros por pagina
+                </label>
+                <label>Procurar
+                  <input id="hrSearch" type="search" placeholder="Nome, telefone ou celular" />
+                </label>
+              </div>
+              <div class="action-row" id="hrAccessFilters">
+                <button class="secondary hr-access-filter active" type="button" data-hr-access-filter="all">Todos</button>
+                <button class="secondary hr-access-filter" type="button" data-hr-access-filter="active">Com acesso ativo</button>
+                <button class="secondary hr-access-filter" type="button" data-hr-access-filter="inactive">Com acesso inativo</button>
+                <button class="secondary hr-access-filter" type="button" data-hr-access-filter="none">Sem acesso</button>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th><button class="secondary hr-sort-button" type="button" data-hr-sort="id">ID</button></th>
+                      <th><button class="secondary hr-sort-button" type="button" data-hr-sort="name">Nome</button></th>
+                      <th><button class="secondary hr-sort-button" type="button" data-hr-sort="phone">Telefone</button></th>
+                      <th><button class="secondary hr-sort-button" type="button" data-hr-sort="mobile">Celular</button></th>
+                      <th><button class="secondary hr-sort-button" type="button" data-hr-sort="sex">Sexo</button></th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="hrTableBody"></tbody>
+                </table>
+              </div>
+              <div class="meta-row"><span id="hrTableMeta">0 registros</span></div>
+              <div class="action-row hr-pagination">
+                <button class="secondary" type="button" id="hrPrevPageButton">Anterior</button>
+                <span class="badge" id="hrPageInfo">Página 1 de 1</span>
+                <button class="secondary" type="button" id="hrNextPageButton">Próxima</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="settings" class="section" data-title="Configurações">
+          <div class="settings-module-grid" aria-label="Atalhos de configuracao por modulo">
+            <a class="settings-module-tile" href="#settings-attendance" data-route="settings-attendance">
+              <svg><use href="#icon-users"></use></svg>
+              <span>Atendimento</span>
+              <small data-settings-meta="settings-attendance">0/0</small>
+            </a>
+            <a class="settings-module-tile" href="#settings-imaging" data-route="settings-imaging">
+              <svg><use href="#icon-image"></use></svg>
+              <span>Central de Laudos</span>
+              <small data-settings-meta="settings-imaging">0/0</small>
+            </a>
+            <a class="settings-module-tile" href="#settings-laboratory" data-route="settings-laboratory">
+              <svg><use href="#icon-lab"></use></svg>
+              <span>Laboratório</span>
+              <small data-settings-meta="settings-laboratory">0/0</small>
+            </a>
+            <a class="settings-module-tile" href="#settings-finance" data-route="settings-finance">
+              <svg><use href="#icon-wallet"></use></svg>
+              <span>Financeiro</span>
+              <small data-settings-meta="settings-finance">0/0</small>
+            </a>
+            <a class="settings-module-tile" href="#settings-relationship" data-route="settings-relationship">
+              <svg><use href="#icon-phone"></use></svg>
+              <span>Relacionamento</span>
+              <small data-settings-meta="settings-relationship">0/0</small>
+            </a>
+            <a class="settings-module-tile" href="#settings-security" data-route="settings-security">
+              <svg><use href="#icon-shield"></use></svg>
+              <span>Segurança</span>
+              <small data-settings-meta="settings-security">0/0</small>
+            </a>
+            <a class="settings-module-tile" href="#human-resources" data-route="human-resources">
+              <svg><use href="#icon-users"></use></svg>
+              <span>Recursos Humanos</span>
+              <small data-settings-meta="human-resources">0/0</small>
+            </a>
+          </div>
+          <div class="settings-readiness-panel panel" id="settingsReadinessPanel">
+            <div class="panel-heading">
+              <h2 id="settingsChecklistTitle">Checklist do modulo</h2>
+              <div class="action-row">
+                <label class="checkbox-inline"><input type="checkbox" id="settingsPendingOnlyToggle" /> So pendencias</label>
+                <button class="secondary" type="button" id="settingsSnapshotButton">Exportar snapshot</button>
+                <span class="badge" id="settingsChecklistBadge">0/0</span>
+              </div>
+            </div>
+            <div class="settings-checklist-list" id="settingsChecklistList"></div>
+          </div>
+          <div class="settings-module-panel" data-subview="attendance">
+            <div class="panel-heading"><h2>Configurações de Atendimento</h2><span class="badge">2 itens</span></div>
+            <div class="settings-submenu-grid">
+              <a class="settings-submenu-tile" href="#settings-registries" data-route="settings-registries">
+                <svg><use href="#icon-users"></use></svg>
+                <span>Cadastros</span>
+              </a>
+              <a class="settings-submenu-tile" href="#settings-menus" data-route="settings-menus">
+                <svg><use href="#icon-settings"></use></svg>
+                <span>Menus</span>
+              </a>
+            </div>
+          </div>
+          <div class="settings-module-panel" data-subview="imaging">
+            <div class="panel-heading"><h2>Configurações da Central de Laudos</h2><span class="badge">2 itens</span></div>
+            <div class="settings-submenu-grid">
+              <a class="settings-submenu-tile" href="#imaging-worklist" data-route="imaging-worklist">
+                <svg><use href="#icon-image"></use></svg>
+                <span>Worklist</span>
+              </a>
+              <a class="settings-submenu-tile" href="#imaging-pacs" data-route="imaging-pacs">
+                <svg><use href="#icon-image"></use></svg>
+                <span>PACS</span>
+              </a>
+            </div>
+          </div>
+          <div class="settings-module-panel" data-subview="finance">
+            <div class="panel-heading"><h2>Configurações de Financeiro e Faturamento</h2><span class="badge">2 itens</span></div>
+            <div class="settings-submenu-grid">
+              <a class="settings-submenu-tile" href="#settings-registries" data-route="settings-registries">
+                <svg><use href="#icon-wallet"></use></svg>
+                <span>Cadastros financeiros</span>
+              </a>
+              <a class="settings-submenu-tile" href="#settings-integrations" data-route="settings-integrations">
+                <svg><use href="#icon-settings"></use></svg>
+                <span>Integrações</span>
+              </a>
+            </div>
+          </div>
+          <div class="settings-module-panel" data-subview="relationship">
+            <div class="panel-heading"><h2>Configurações de Relacionamento</h2><span class="badge">2 itens</span></div>
+            <div class="settings-submenu-grid">
+              <a class="settings-submenu-tile" href="#relationship-ura" data-route="relationship-ura">
+                <svg><use href="#icon-phone"></use></svg>
+                <span>URA</span>
+              </a>
+              <a class="settings-submenu-tile" href="#relationship-whatsapp" data-route="relationship-whatsapp">
+                <svg><use href="#icon-phone"></use></svg>
+                <span>WhatsApp</span>
+              </a>
+            </div>
+          </div>
+          <div class="settings-module-panel" data-subview="security">
+            <div class="panel-heading"><h2>Configurações de Segurança</h2><span class="badge">4 itens</span></div>
+            <div class="settings-submenu-grid">
+              <a class="settings-submenu-tile" href="#security-users" data-route="security-users">
+                <svg><use href="#icon-shield"></use></svg>
+                <span>Usuarios</span>
+              </a>
+              <a class="settings-submenu-tile" href="#security-permissions" data-route="security-permissions">
+                <svg><use href="#icon-shield"></use></svg>
+                <span>Grupos e permissoes</span>
+              </a>
+              <a class="settings-submenu-tile" href="#security-system-state" data-route="security-system-state">
+                <svg><use href="#icon-shield"></use></svg>
+                <span>Estado do sistema</span>
+              </a>
+              <a class="settings-submenu-tile" href="#security-lgpd" data-route="security-lgpd">
+                <svg><use href="#icon-shield"></use></svg>
+                <span>LGPD</span>
+              </a>
+            </div>
+          </div>
+          <div class="panel" data-subview="imaging-worklist">
+            <div class="panel-heading"><h2>Worklist e PACS</h2></div>
+            <div class="list" id="worklistList"></div>
+          </div>
+          <div class="panel" data-subview="imaging-pacs">
+            <div class="panel-heading"><h2>Estudos PACS</h2></div>
+            <div class="list" id="pacsStudiesList"></div>
+          </div>
+          <div class="settings-module-panel" data-subview="laboratory">
+            <div class="panel-heading"><h2>Configurações do Laboratório</h2><span class="badge">1 item</span></div>
+            <div class="settings-submenu-grid">
+              <a class="settings-submenu-tile" href="#laboratory-lis" data-route="laboratory-lis">
+                <svg><use href="#icon-lab"></use></svg>
+                <span>Interfaces LIS</span>
+              </a>
+            </div>
+          </div>
+          <div class="workbench" data-subview="laboratory-lis">
+            <form class="panel form-grid" id="lisInterfaceForm">
+              <div class="panel-heading"><h2>Interface LIS</h2></div>
+              <label>Equipamento <input name="equipmentName" required /></label>
+              <label>Codigo <input name="equipmentCode" /></label>
+              <label>Protocolo <select name="protocol"><option>ASTM</option><option>HL7</option><option>API</option></select></label>
+              <label>Conexao <input name="connection" placeholder="TCP 10.0.0.20:5000" /></label>
+              <button type="submit" data-permission="lis_interface">Cadastrar interface</button>
+            </form>
+            <div class="panel">
+              <div class="panel-heading"><h2>Interfaces</h2></div>
+              <div class="list" id="lisInterfacesList"></div>
+            </div>
+          </div>
+          <div class="settings-layout" data-subview="registries">
+            <aside class="panel">
+              <div class="panel-heading"><h2>Cadastros</h2></div>
+              <input id="registrySearch" placeholder="Buscar cadastro" />
+              <div class="registry-type-list" id="registryTypeList"></div>
+            </aside>
+            <div class="panel">
+              <div class="panel-heading"><h2 id="registryTitle">Cadastros</h2></div>
+              <form class="form-grid inline-form" id="registryForm"></form>
+              <div class="list" id="registryRecordsList"></div>
+            </div>
+          </div>
+          <div class="panel" data-subview="integrations">
+            <div class="panel-heading"><h2>Integrações</h2></div>
+            <div class="empty-state">Parametros locais de sistemas externos, PACS, fiscal e gateways ficam isolados nesta subpagina.</div>
+          </div>
+          <div class="panel" data-subview="menus">
+            <div class="panel-heading"><h2>Menus do sistema</h2><span class="badge" id="menuAuditStatus">Validando</span></div>
+            <div class="summary-grid" id="menuAuditSummary"></div>
+            <div class="list" id="menuAuditIssues"></div>
+            <div class="list" id="menuAuditList"></div>
+          </div>
+        </section>
+
+        <section id="access-denied" class="section" data-title="Acesso negado">
+          <div class="panel">
+            <div class="panel-heading"><h2>Acesso negado</h2><span class="badge danger" id="accessDeniedBadge">Restrito</span></div>
+            <div class="empty-state" id="accessDeniedMessage">Este menu exige permissao operacional ou esta inativo.</div>
+            <div class="summary-grid" id="accessDeniedSummary"></div>
+            <div class="action-row">
+              <a class="button-link" href="#dashboard" data-route="dashboard" data-section="dashboard" data-parent="dashboard">Voltar ao Dashboard</a>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="login-overlay" id="loginOverlay">
+      <form class="login-card" id="loginForm">
+        <span class="brand-mark">CA</span>
+        <h2>Entrar no sistema</h2>
+        <label>E-mail <input name="email" type="email" value="admin@clinic.local" required /></label>
+        <label>Senha <input name="password" type="password" value="admin123" required /></label>
+        <button type="submit">Entrar</button>
+        <small id="loginError"></small>
+      </form>
+    </div>
+
+    <div class="login-overlay hidden" id="registryDeleteModal" aria-hidden="true">
+      <div class="login-card delete-modal-card">
+        <h2>Excluir cadastro</h2>
+        <p class="meta-row">Esta ação é permanente. Digite <strong>EXCLUIR</strong> para confirmar.</p>
+        <label>Confirmação <input id="registryDeleteConfirmInput" autocomplete="off" /></label>
+        <small id="registryDeleteError"></small>
+        <div class="action-row">
+          <button class="danger" type="button" id="registryDeleteConfirmButton" disabled>Excluir</button>
+          <button class="secondary" type="button" id="registryDeleteCancelButton">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

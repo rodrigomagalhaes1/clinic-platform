@@ -1,3 +1,5 @@
+import { normalize } from "@clinic/shared";
+
 const API_BASE_URL = window.location.origin;
 const tokenKey = "clinic.session.token";
 const sidebarPinnedKey = "clinic.sidebar.pinned";
@@ -5556,9 +5558,7 @@ function csv(value) {
   return String(value ?? "").split(",").map((item) => item.trim()).filter(Boolean);
 }
 
-function normalize(value) {
-  return String(value ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-}
+// normalize() importada de @clinic/shared \u2014 ver packages/shared/src/index.ts
 
 function escapeHtml(value) {
   return String(value ?? "")

@@ -1,17 +1,22 @@
 $ProjectDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$CodexNode = Join-Path $env:LOCALAPPDATA "OpenAI\Codex\bin\node.exe"
 $NodeCommand = Get-Command node -ErrorAction SilentlyContinue
 
-if ($NodeCommand) {
-  & $NodeCommand.Source (Join-Path $ProjectDir "apps\web\serve-static.mjs")
-  exit $LASTEXITCODE
+if (-not $NodeCommand) {
+  Write-Error "Node.js nao foi encontrado. Instale o Node.js 20 ou superior."
+  exit 1
 }
 
-if (Test-Path $CodexNode) {
-  & $CodexNode (Join-Path $ProjectDir "apps\web\serve-static.mjs")
-  exit $LASTEXITCODE
+# Instala dependencias se node_modules ainda nao existir
+$WebDir = Join-Path $ProjectDir "apps\web"
+if (-not (Test-Path (Join-Path $ProjectDir "node_modules"))) {
+  Write-Host "Instalando dependencias..."
+  Push-Location $ProjectDir
+  npm install
+  Pop-Location
 }
 
-Write-Error "Node.js nao foi encontrado. Instale o Node.js 20 ou superior, ou execute pelo ambiente do Codex."
-exit 1
+# Sobe o Vite em modo dev (HMR, resolve workspace packages via alias)
+Push-Location $WebDir
+npx vite
+Pop-Location
 

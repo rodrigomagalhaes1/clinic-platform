@@ -2,7 +2,7 @@ import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
-import type { Appointment, FinancialEntry, MedicalInvoice, Patient } from "../../../../packages/domain/src/index.ts";
+import type { Appointment, FinancialEntry, MedicalInvoice, Patient } from "@clinic/domain";
 
 const projectRoot = fileURLToPath(new URL("../../../../", import.meta.url));
 const databasePath = join(projectRoot, "data", "clinic.sqlite");

@@ -1,0 +1,48 @@
+const _dateTime = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" });
+/**
+ * Formata uma data/string de data para exibição em pt-BR.
+ * Retorna "Sem data" para valores falsy e preserva o valor original
+ * caso não seja uma data válida.
+ *
+ * @example formatDate("2026-06-08T17:00:00Z") // "08/06/2026 14:00"
+ * @example formatDate(null) // "Sem data"
+ */
+export function formatDate(value) {
+    if (!value)
+        return "Sem data";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? String(value) : _dateTime.format(date);
+}
+/**
+ * Escapa caracteres especiais HTML para prevenir XSS em templates de string.
+ * Converte &, <, >, " e ' para suas entidades HTML equivalentes.
+ *
+ * @example escapeHtml('<script>alert("xss")</script>') // '&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;'
+ * @example escapeHtml(null) // ''
+ */
+export function escapeHtml(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+export function toCurrencyFromCents(amountCents, locale = "pt-BR", currency = "BRL") {
+    return new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency
+    }).format(amountCents / 100);
+}
+/**
+ * Normaliza uma string para comparações case-insensitive sem acento.
+ * Remove diacríticos (NFD) e converte para minúsculas.
+ *
+ * Usado em: busca de agenda, filtros financeiros, matching de planos,
+ * pesquisa de RH, detecção de tipo de exame, validação de guias.
+ *
+ * @example normalize("Clínica São Paulo") // "clinica sao paulo"
+ */
+export function normalize(value) {
+    return String(value ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+}

@@ -6,6 +6,7 @@ import { dirname, extname, isAbsolute, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { DatabaseSync } from "node:sqlite";
+import { normalize as normalizeText } from "@clinic/shared";
 import { createAppointmentsModule } from "./modules/appointments.mjs";
 import { composeRouteModules } from "./modules/router.mjs";
 import { createUraModule } from "./modules/relationship-ura.mjs";
@@ -6132,9 +6133,4 @@ function inferRelationshipIntent(queueId, reason) {
   return labels[queueId] ?? "Relacionamento";
 }
 
-function normalizeText(value) {
-  return String(value ?? "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-}
+// normalizeText importada de @clinic/shared como alias \u2014 ver packages/shared/src/index.ts

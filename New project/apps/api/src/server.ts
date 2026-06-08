@@ -3,7 +3,7 @@ import { initialAgents } from "@clinic/agents";
 import { modules } from "./modules/index.ts";
 import { createSqliteStore } from "./store/sqlite-store.ts";
 import { createInMemoryStore } from "./store/in-memory-store.ts";
-import { badRequest, created, json, noContent, notFound, parseJsonBody } from "./support/http.ts";
+import { BadRequestError, badRequest, created, json, noContent, notFound, parseJsonBody } from "./support/http.ts";
 import { createId } from "./support/id.ts";
 
 export type AppStore = ReturnType<typeof createInMemoryStore>;
@@ -226,6 +226,9 @@ export function createApp(store: AppStore = createSqliteStore()) {
 
       return notFound(response);
     } catch (error) {
+      if (error instanceof BadRequestError) {
+        return json(response, 400, { error: { code: "bad_request", message: error.message } });
+      }
       const message = error instanceof Error ? error.message : "Unexpected error";
       return json(response, 500, { error: { code: "internal_error", message } });
     }

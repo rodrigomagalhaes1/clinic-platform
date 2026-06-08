@@ -1,3 +1,5 @@
+import { normalize } from "@clinic/shared";
+
 const API_BASE_URL = window.location.origin;
 const tokenKey = "clinic.session.token";
 const sidebarPinnedKey = "clinic.sidebar.pinned";
@@ -5556,12 +5558,7 @@ function csv(value) {
   return String(value ?? "").split(",").map((item) => item.trim()).filter(Boolean);
 }
 
-// normalize() \u00e9 a fonte can\u00f4nica em packages/shared/src/index.ts
-// Mantida aqui pois app.js n\u00e3o usa bundler/imports ES module ainda.
-// TODO: remover quando web migrar para bundler (Vite/esbuild).
-function normalize(value) {
-  return String(value ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-}
+// normalize() importada de @clinic/shared \u2014 ver packages/shared/src/index.ts
 
 function escapeHtml(value) {
   return String(value ?? "")

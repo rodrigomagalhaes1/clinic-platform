@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { normalize, escapeHtml, toCurrencyFromCents, formatDate, parseList, toLocalDateTime } from "./index";
+import { normalize, escapeHtml, toCurrencyFromCents, formatDate, parseList, toLocalDateTime, optionalString } from "./index";
 describe("normalize", () => {
     it("remove acentos e converte para minúsculas", () => {
         expect(normalize("Clínica São Paulo")).toBe("clinica sao paulo");
@@ -108,5 +108,25 @@ describe("toLocalDateTime", () => {
         const result = toLocalDateTime(utcMidnight);
         // Resultado depende do fuso, mas deve ser válido
         expect(result).toMatch(/^2025-12-31T|^2026-01-01T/);
+    });
+});
+describe("optionalString", () => {
+    it("retorna a string quando não-vazia", () => {
+        expect(optionalString("hello")).toBe("hello");
+        expect(optionalString("0")).toBe("0");
+        expect(optionalString(" ")).toBe(" ");
+    });
+    it("retorna undefined para string vazia", () => {
+        expect(optionalString("")).toBeUndefined();
+    });
+    it("retorna undefined para null e undefined", () => {
+        expect(optionalString(null)).toBeUndefined();
+        expect(optionalString(undefined)).toBeUndefined();
+    });
+    it("retorna undefined para tipos não-string", () => {
+        expect(optionalString(42)).toBeUndefined();
+        expect(optionalString(true)).toBeUndefined();
+        expect(optionalString([])).toBeUndefined();
+        expect(optionalString({})).toBeUndefined();
     });
 });

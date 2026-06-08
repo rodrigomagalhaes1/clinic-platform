@@ -5,6 +5,7 @@ import { createSqliteStore } from "./store/sqlite-store.ts";
 import { createInMemoryStore } from "./store/in-memory-store.ts";
 import { BadRequestError, badRequest, created, json, noContent, notFound, parseJsonBody } from "./support/http.ts";
 import { createId } from "./support/id.ts";
+import { optionalString } from "@clinic/shared";
 
 export type AppStore = ReturnType<typeof createInMemoryStore>;
 
@@ -242,6 +243,3 @@ function getClinicId(request: IncomingMessage) {
   return typeof clinicId === "string" && clinicId.length > 0 ? clinicId : "clinic_demo";
 }
 
-function optionalString(value: unknown) {
-  return typeof value === "string" && value.length > 0 ? value : undefined;
-}

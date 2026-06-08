@@ -1,11 +1,10 @@
 import { mkdirSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { dirname } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import type { Appointment, FinancialEntry, MedicalInvoice, Patient } from "@clinic/domain";
+import { config } from "../config.ts";
 
-const projectRoot = fileURLToPath(new URL("../../../../", import.meta.url));
-const databasePath = join(projectRoot, "data", "clinic.sqlite");
+const databasePath = config.databasePath;
 
 type CollectionName = "patients" | "appointments" | "invoices" | "financial_entries";
 

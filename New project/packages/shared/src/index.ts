@@ -45,6 +45,17 @@ export function parseList(value: unknown): string[] {
   return String(value).split(",").map((item) => item.trim()).filter(Boolean);
 }
 
+/**
+ * Converte um Date para o formato `YYYY-MM-DDTHH:MM` usado em inputs
+ * do tipo `datetime-local`, ajustado para o fuso horário local.
+ *
+ * @example toLocalDateTime(new Date("2026-06-08T15:00:00Z")) // "2026-06-08T12:00" (UTC-3)
+ */
+export function toLocalDateTime(date: Date): string {
+  const offset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+}
+
 export type Result<T, E = Error> =
   | { ok: true; value: T }
   | { ok: false; error: E };

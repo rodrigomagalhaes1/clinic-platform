@@ -1,4 +1,4 @@
-import { normalize, toCurrencyFromCents, formatDate, escapeHtml, parseList } from "@clinic/shared";
+import { normalize, toCurrencyFromCents, formatDate, escapeHtml, parseList, toLocalDateTime } from "@clinic/shared";
 
 const API_BASE_URL = window.location.origin;
 const tokenKey = "clinic.session.token";
@@ -5561,9 +5561,6 @@ function setDefaultAppointmentTimes() {
   els.appointmentForm.elements.endsAt.value = toLocalDateTime(end);
 }
 
-function toLocalDateTime(date) {
-  const offset = date.getTimezoneOffset() * 60000;
-  return new Date(date.getTime() - offset).toISOString().slice(0, 16);
-}
+// toLocalDateTime importada de @clinic/shared — ver packages/shared/src/index.ts
 
 setDefaultAppointmentTimes();

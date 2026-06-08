@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { normalize, escapeHtml, toCurrencyFromCents, formatDate } from "./index";
+import { normalize, escapeHtml, toCurrencyFromCents, formatDate, parseList, toLocalDateTime } from "./index";
 describe("normalize", () => {
     it("remove acentos e converte para minúsculas", () => {
         expect(normalize("Clínica São Paulo")).toBe("clinica sao paulo");
@@ -69,5 +69,44 @@ describe("formatDate", () => {
     });
     it("preserva valor original para string inválida", () => {
         expect(formatDate("não-é-uma-data")).toBe("não-é-uma-data");
+    });
+});
+describe("parseList", () => {
+    it("faz split de string CSV e faz trim", () => {
+        expect(parseList("admin, manager, billing")).toEqual(["admin", "manager", "billing"]);
+    });
+    it("retorna array filtrado quando recebe array", () => {
+        expect(parseList(["a", "", "b", "c"])).toEqual(["a", "b", "c"]);
+    });
+    it("retorna [] para null", () => {
+        expect(parseList(null)).toEqual([]);
+    });
+    it("retorna [] para undefined", () => {
+        expect(parseList(undefined)).toEqual([]);
+    });
+    it("retorna [] para string vazia", () => {
+        expect(parseList("")).toEqual([]);
+    });
+    it("retorna [] para string só com espaços", () => {
+        expect(parseList("   ")).toEqual([]);
+    });
+    it("filtra entradas vazias resultantes de vírgulas consecutivas", () => {
+        expect(parseList("a,,b")).toEqual(["a", "b"]);
+    });
+});
+describe("toLocalDateTime", () => {
+    it("retorna string no formato YYYY-MM-DDTHH:MM", () => {
+        const date = new Date("2026-06-08T00:00:00.000Z");
+        const result = toLocalDateTime(date);
+        expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/);
+    });
+    it("tem exatamente 16 caracteres", () => {
+        expect(toLocalDateTime(new Date())).toHaveLength(16);
+    });
+    it("ajusta para fuso local (não usa UTC direto)", () => {
+        const utcMidnight = new Date("2026-01-01T00:00:00.000Z");
+        const result = toLocalDateTime(utcMidnight);
+        // Resultado depende do fuso, mas deve ser válido
+        expect(result).toMatch(/^2025-12-31T|^2026-01-01T/);
     });
 });

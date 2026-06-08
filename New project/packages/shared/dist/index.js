@@ -44,6 +44,16 @@ export function parseList(value) {
         return [];
     return String(value).split(",").map((item) => item.trim()).filter(Boolean);
 }
+/**
+ * Converte um Date para o formato `YYYY-MM-DDTHH:MM` usado em inputs
+ * do tipo `datetime-local`, ajustado para o fuso horário local.
+ *
+ * @example toLocalDateTime(new Date("2026-06-08T15:00:00Z")) // "2026-06-08T12:00" (UTC-3)
+ */
+export function toLocalDateTime(date) {
+    const offset = date.getTimezoneOffset() * 60000;
+    return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+}
 export function toCurrencyFromCents(amountCents, locale = "pt-BR", currency = "BRL") {
     return new Intl.NumberFormat(locale, {
         style: "currency",

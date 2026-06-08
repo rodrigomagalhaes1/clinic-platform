@@ -25,6 +25,13 @@ export declare function escapeHtml(value: unknown): string;
  * @example parseList(null)                      // []
  */
 export declare function parseList(value: unknown): string[];
+/**
+ * Converte um Date para o formato `YYYY-MM-DDTHH:MM` usado em inputs
+ * do tipo `datetime-local`, ajustado para o fuso horário local.
+ *
+ * @example toLocalDateTime(new Date("2026-06-08T15:00:00Z")) // "2026-06-08T12:00" (UTC-3)
+ */
+export declare function toLocalDateTime(date: Date): string;
 export type Result<T, E = Error> = {
     ok: true;
     value: T;

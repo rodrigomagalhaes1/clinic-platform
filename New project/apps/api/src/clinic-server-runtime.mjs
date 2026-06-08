@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { DatabaseSync } from "node:sqlite";
 import { normalize as normalizeText, parseList } from "@clinic/shared";
+import { initialAgents } from "@clinic/agents";
 import { createAppointmentsModule } from "./modules/appointments.mjs";
 import { composeRouteModules } from "./modules/router.mjs";
 import { createUraModule } from "./modules/relationship-ura.mjs";
@@ -58,35 +59,7 @@ function resolveProjectPath(value, fallback) {
   return normalize(isAbsolute(value) ? value : join(projectRoot, value));
 }
 
-const initialAgents = [
-  {
-    id: "appointment-confirmation",
-    name: "Agente de Confirmacao de Consultas",
-    purpose: "Identificar consultas proximas, sugerir mensagens e registrar confirmacoes.",
-    tools: [{ name: "sendAppointmentConfirmation", riskLevel: "medium", requiresHumanApproval: false }]
-  },
-  {
-    id: "pre-billing-review",
-    name: "Agente de Pre-Faturamento",
-    purpose: "Encontrar atendimentos sem cobranca, dados incompletos e possiveis glosas.",
-    tools: [{ name: "createBillingReviewTask", riskLevel: "low", requiresHumanApproval: false }]
-  },
-  {
-    id: "collections-assistant",
-    name: "Agente de Cobranca",
-    purpose: "Priorizar inadimplencias e sugerir comunicacoes de cobranca.",
-    tools: [{ name: "sendCollectionMessage", riskLevel: "high", requiresHumanApproval: true }]
-  },
-  {
-    id: "relationship-assistant",
-    name: "Agente de Relacionamento",
-    purpose: "Classificar chamadas, WhatsApp, avaliacoes e comentarios, sugerindo respostas naturais com escalonamento humano.",
-    tools: [
-      { name: "draftHumanizedReply", riskLevel: "medium", requiresHumanApproval: false },
-      { name: "publishPublicReply", riskLevel: "high", requiresHumanApproval: true }
-    ]
-  }
-];
+// initialAgents importado de @clinic/agents — ver packages/agents/src/index.ts
 
 const relationshipQueues = [
   { id: "scheduling", name: "Agendamento", dtmf: "1", transferTarget: "SIP/fila-agendamento" },

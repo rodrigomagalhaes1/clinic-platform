@@ -35,7 +35,7 @@ data/
 
 ## Pré-requisitos
 
-- **Node.js 20+**
+- **Node.js 22+** (requerido para `node:sqlite`)
 - **npm 10+** (vem com o Node.js)
 
 ## Configuração inicial

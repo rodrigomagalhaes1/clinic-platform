@@ -166,6 +166,31 @@ describe("Patients", () => {
     const { status } = await request(port, "DELETE", "/v1/patients/nonexistent_id");
     expect(status).toBe(404);
   });
+
+  it("PATCH /v1/patients/:id updates patient fields", async () => {
+    const create = await request(port, "POST", "/v1/patients", {
+      fullName: "Nome Original",
+      phone: "11999990000"
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const { status, body } = await request(port, "PATCH", `/v1/patients/${id}`, {
+      fullName: "Nome Atualizado",
+      email: "novo@email.com"
+    });
+    expect(status).toBe(200);
+    const patient = (body as Record<string, unknown>).data as Record<string, unknown>;
+    expect(patient.fullName).toBe("Nome Atualizado");
+    expect(patient.email).toBe("novo@email.com");
+    expect(patient.phone).toBe("11999990000");
+  });
+
+  it("PATCH /v1/patients/:id returns 404 for unknown id", async () => {
+    const { status } = await request(port, "PATCH", "/v1/patients/nonexistent_id", {
+      fullName: "Qualquer Nome"
+    });
+    expect(status).toBe(404);
+  });
 });
 
 describe("Appointments", () => {

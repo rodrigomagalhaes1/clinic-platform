@@ -50,6 +50,23 @@ export function createApp(store: AppStore = createSqliteStore()) {
         if (!patient) return notFound(response);
         return json(response, 200, { data: patient });
       }
+      if (method === "PATCH" && patientMatch) {
+        const patient = store.patients.get(patientMatch[1] ?? "");
+        if (!patient) return notFound(response);
+
+        const body = await parseJsonBody(request);
+        const updated = store.patients.create({
+          ...patient,
+          fullName: typeof body.fullName === "string" && body.fullName.length > 0 ? body.fullName : patient.fullName,
+          documentNumber: "documentNumber" in body ? optionalString(body.documentNumber) : patient.documentNumber,
+          birthDate: "birthDate" in body ? optionalString(body.birthDate) : patient.birthDate,
+          phone: "phone" in body ? optionalString(body.phone) : patient.phone,
+          email: "email" in body ? optionalString(body.email) : patient.email,
+          updatedAt: new Date()
+        });
+
+        return json(response, 200, { data: updated });
+      }
       if (method === "DELETE" && patientMatch) {
         const removed = store.patients.remove(patientMatch[1] ?? "");
         if (!removed) return notFound(response);

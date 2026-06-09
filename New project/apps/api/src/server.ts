@@ -41,7 +41,17 @@ export function createApp(store: AppStore = createSqliteStore()) {
       }
 
       if (method === "GET" && url.pathname === "/v1/patients") {
-        return json(response, 200, { data: store.patients.list() });
+        const search = url.searchParams.get("search")?.toLowerCase();
+        let patients = store.patients.list();
+        if (search) {
+          patients = patients.filter((p) =>
+            p.fullName.toLowerCase().includes(search) ||
+            p.email?.toLowerCase().includes(search) ||
+            p.phone?.includes(search) ||
+            p.documentNumber?.includes(search)
+          );
+        }
+        return json(response, 200, { data: patients });
       }
 
       const patientMatch = url.pathname.match(/^\/v1\/patients\/([^/]+)$/);
@@ -78,7 +88,14 @@ export function createApp(store: AppStore = createSqliteStore()) {
       }
 
       if (method === "GET" && url.pathname === "/v1/appointments") {
-        return json(response, 200, { data: store.appointments.list() });
+        const patientId = url.searchParams.get("patientId");
+        const professionalId = url.searchParams.get("professionalId");
+        const status = url.searchParams.get("status");
+        let appointments = store.appointments.list();
+        if (patientId) appointments = appointments.filter((a) => a.patientId === patientId);
+        if (professionalId) appointments = appointments.filter((a) => a.professionalId === professionalId);
+        if (status) appointments = appointments.filter((a) => a.status === status);
+        return json(response, 200, { data: appointments });
       }
 
       const appointmentMatch = url.pathname.match(/^\/v1\/appointments\/([^/]+)$/);
@@ -174,7 +191,12 @@ export function createApp(store: AppStore = createSqliteStore()) {
       }
 
       if (method === "GET" && url.pathname === "/v1/billing/invoices") {
-        return json(response, 200, { data: store.invoices.list() });
+        const patientId = url.searchParams.get("patientId");
+        const status = url.searchParams.get("status");
+        let invoices = store.invoices.list();
+        if (patientId) invoices = invoices.filter((i) => i.patientId === patientId);
+        if (status) invoices = invoices.filter((i) => i.status === status);
+        return json(response, 200, { data: invoices });
       }
 
       const invoiceMatch = url.pathname.match(/^\/v1\/billing\/invoices\/([^/]+)$/);
@@ -234,7 +256,14 @@ export function createApp(store: AppStore = createSqliteStore()) {
       }
 
       if (method === "GET" && url.pathname === "/v1/finance/entries") {
-        return json(response, 200, { data: store.financialEntries.list() });
+        const direction = url.searchParams.get("direction");
+        const status = url.searchParams.get("status");
+        const costCenter = url.searchParams.get("costCenter");
+        let entries = store.financialEntries.list();
+        if (direction) entries = entries.filter((e) => e.direction === direction);
+        if (status) entries = entries.filter((e) => e.status === status);
+        if (costCenter) entries = entries.filter((e) => e.costCenter === costCenter);
+        return json(response, 200, { data: entries });
       }
 
       const financeEntryMatch = url.pathname.match(/^\/v1\/finance\/entries\/([^/]+)$/);

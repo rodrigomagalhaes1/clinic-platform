@@ -7,7 +7,7 @@ import { createInMemoryStore } from "./store/in-memory-store.ts";
 // Test helpers
 // ---------------------------------------------------------------------------
 
-type HttpMethod = "GET" | "POST" | "PATCH" | "OPTIONS";
+type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE" | "OPTIONS";
 
 function startServer() {
   const store = createInMemoryStore();
@@ -150,6 +150,22 @@ describe("Patients", () => {
     const { status } = await request(port, "GET", "/v1/patients/nonexistent_id");
     expect(status).toBe(404);
   });
+
+  it("DELETE /v1/patients/:id removes the patient", async () => {
+    const create = await request(port, "POST", "/v1/patients", { fullName: "Paciente Para Deletar" });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const del = await request(port, "DELETE", `/v1/patients/${id}`);
+    expect(del.status).toBe(204);
+
+    const get = await request(port, "GET", `/v1/patients/${id}`);
+    expect(get.status).toBe(404);
+  });
+
+  it("DELETE /v1/patients/:id returns 404 for unknown id", async () => {
+    const { status } = await request(port, "DELETE", "/v1/patients/nonexistent_id");
+    expect(status).toBe(404);
+  });
 });
 
 describe("Appointments", () => {
@@ -199,6 +215,27 @@ describe("Appointments", () => {
     const { status } = await request(port, "GET", "/v1/appointments/nonexistent_id");
     expect(status).toBe(404);
   });
+
+  it("DELETE /v1/appointments/:id removes the appointment", async () => {
+    const create = await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_del",
+      professionalId: "pro_del",
+      startsAt: "2025-03-01T09:00:00Z",
+      endsAt: "2025-03-01T10:00:00Z"
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const del = await request(port, "DELETE", `/v1/appointments/${id}`);
+    expect(del.status).toBe(204);
+
+    const get = await request(port, "GET", `/v1/appointments/${id}`);
+    expect(get.status).toBe(404);
+  });
+
+  it("DELETE /v1/appointments/:id returns 404 for unknown id", async () => {
+    const { status } = await request(port, "DELETE", "/v1/appointments/nonexistent_id");
+    expect(status).toBe(404);
+  });
 });
 
 describe("Billing invoices", () => {
@@ -242,6 +279,25 @@ describe("Billing invoices", () => {
 
   it("GET /v1/billing/invoices/:id returns 404 for unknown id", async () => {
     const { status } = await request(port, "GET", "/v1/billing/invoices/nonexistent_id");
+    expect(status).toBe(404);
+  });
+
+  it("DELETE /v1/billing/invoices/:id removes the invoice", async () => {
+    const create = await request(port, "POST", "/v1/billing/invoices", {
+      patientId: "pat_inv_del",
+      totalAmountCents: 5000
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const del = await request(port, "DELETE", `/v1/billing/invoices/${id}`);
+    expect(del.status).toBe(204);
+
+    const get = await request(port, "GET", `/v1/billing/invoices/${id}`);
+    expect(get.status).toBe(404);
+  });
+
+  it("DELETE /v1/billing/invoices/:id returns 404 for unknown id", async () => {
+    const { status } = await request(port, "DELETE", "/v1/billing/invoices/nonexistent_id");
     expect(status).toBe(404);
   });
 });
@@ -294,6 +350,27 @@ describe("Finance entries", () => {
 
   it("GET /v1/finance/entries/:id returns 404 for unknown id", async () => {
     const { status } = await request(port, "GET", "/v1/finance/entries/nonexistent_id");
+    expect(status).toBe(404);
+  });
+
+  it("DELETE /v1/finance/entries/:id removes the entry", async () => {
+    const create = await request(port, "POST", "/v1/finance/entries", {
+      direction: "receivable",
+      description: "Entrada para deletar",
+      amountCents: 3000,
+      dueDate: "2025-04-01"
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const del = await request(port, "DELETE", `/v1/finance/entries/${id}`);
+    expect(del.status).toBe(204);
+
+    const get = await request(port, "GET", `/v1/finance/entries/${id}`);
+    expect(get.status).toBe(404);
+  });
+
+  it("DELETE /v1/finance/entries/:id returns 404 for unknown id", async () => {
+    const { status } = await request(port, "DELETE", "/v1/finance/entries/nonexistent_id");
     expect(status).toBe(404);
   });
 });

@@ -37,6 +37,11 @@ function createCollection<T extends { id: string }>(database: DatabaseSync, coll
     limit 1
   `);
 
+  const del = database.prepare(`
+    delete from records
+    where collection = ? and id = ?
+  `);
+
   return {
     create(row: T) {
       insert.run(collection, row.id, JSON.stringify(row));
@@ -48,6 +53,10 @@ function createCollection<T extends { id: string }>(database: DatabaseSync, coll
     get(id: string) {
       const record = get.get(collection, id) as StoredRow<T> | undefined;
       return record ? JSON.parse(String(record.payload)) as T : undefined;
+    },
+    remove(id: string) {
+      const result = del.run(collection, id);
+      return result.changes > 0;
     }
   };
 }

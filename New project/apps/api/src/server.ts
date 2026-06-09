@@ -3,7 +3,7 @@ import { initialAgents } from "@clinic/agents";
 import { modules } from "./modules/index.ts";
 import { createSqliteStore } from "./store/sqlite-store.ts";
 import { createInMemoryStore } from "./store/in-memory-store.ts";
-import { BadRequestError, badRequest, created, json, noContent, notFound, parseJsonBody } from "./support/http.ts";
+import { BadRequestError, badRequest, created, deleted, json, noContent, notFound, parseJsonBody } from "./support/http.ts";
 import { createId, optionalString } from "@clinic/shared";
 
 export type AppStore = ReturnType<typeof createInMemoryStore>;
@@ -50,6 +50,11 @@ export function createApp(store: AppStore = createSqliteStore()) {
         if (!patient) return notFound(response);
         return json(response, 200, { data: patient });
       }
+      if (method === "DELETE" && patientMatch) {
+        const removed = store.patients.remove(patientMatch[1] ?? "");
+        if (!removed) return notFound(response);
+        return deleted(response);
+      }
 
       if (method === "POST" && url.pathname === "/v1/patients") {
         const body = await parseJsonBody(request);
@@ -81,6 +86,11 @@ export function createApp(store: AppStore = createSqliteStore()) {
         const appointment = store.appointments.get(appointmentMatch[1] ?? "");
         if (!appointment) return notFound(response);
         return json(response, 200, { data: appointment });
+      }
+      if (method === "DELETE" && appointmentMatch) {
+        const removed = store.appointments.remove(appointmentMatch[1] ?? "");
+        if (!removed) return notFound(response);
+        return deleted(response);
       }
 
       const appointmentStatusMatch = url.pathname.match(/^\/v1\/appointments\/([^/]+)\/status$/);
@@ -152,6 +162,11 @@ export function createApp(store: AppStore = createSqliteStore()) {
         if (!invoice) return notFound(response);
         return json(response, 200, { data: invoice });
       }
+      if (method === "DELETE" && invoiceMatch) {
+        const removed = store.invoices.remove(invoiceMatch[1] ?? "");
+        if (!removed) return notFound(response);
+        return deleted(response);
+      }
 
       if (method === "POST" && url.pathname === "/v1/billing/invoices") {
         const body = await parseJsonBody(request);
@@ -183,6 +198,11 @@ export function createApp(store: AppStore = createSqliteStore()) {
         const entry = store.financialEntries.get(financeEntryMatch[1] ?? "");
         if (!entry) return notFound(response);
         return json(response, 200, { data: entry });
+      }
+      if (method === "DELETE" && financeEntryMatch) {
+        const removed = store.financialEntries.remove(financeEntryMatch[1] ?? "");
+        if (!removed) return notFound(response);
+        return deleted(response);
       }
 
       if (method === "POST" && url.pathname === "/v1/finance/entries") {

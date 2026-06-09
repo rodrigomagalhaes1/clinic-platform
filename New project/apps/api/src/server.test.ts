@@ -135,6 +135,15 @@ describe("Patients", () => {
     expect(list.some((p) => (p as Record<string, unknown>).fullName === "João Costa")).toBe(true);
   });
 
+  it("GET /v1/patients?search= filters by name", async () => {
+    await request(port, "POST", "/v1/patients", { fullName: "Ana Beatriz Filtro" });
+    await request(port, "POST", "/v1/patients", { fullName: "Carlos Outro" });
+    const { body } = await request(port, "GET", "/v1/patients?search=beatriz");
+    const list = (body as Record<string, unknown>).data as Record<string, unknown>[];
+    expect(list.every((p) => (p.fullName as string).toLowerCase().includes("beatriz"))).toBe(true);
+    expect(list.length).toBeGreaterThan(0);
+  });
+
   it("GET /v1/patients/:id returns the patient", async () => {
     const create = await request(port, "POST", "/v1/patients", { fullName: "Carla Mendes" });
     const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
@@ -186,6 +195,25 @@ describe("Appointments", () => {
     const appt = (body as Record<string, unknown>).data as Record<string, unknown>;
     expect(appt.status).toBe("scheduled");
     expect(appt.patientId).toBe("pat_123");
+  });
+
+  it("GET /v1/appointments?patientId= filters by patient", async () => {
+    await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_filter_A",
+      professionalId: "pro_X",
+      startsAt: "2025-08-01T09:00:00Z",
+      endsAt: "2025-08-01T09:30:00Z"
+    });
+    await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_filter_B",
+      professionalId: "pro_X",
+      startsAt: "2025-08-01T10:00:00Z",
+      endsAt: "2025-08-01T10:30:00Z"
+    });
+    const { body } = await request(port, "GET", "/v1/appointments?patientId=pat_filter_A");
+    const list = (body as Record<string, unknown>).data as Record<string, unknown>[];
+    expect(list.every((a) => a.patientId === "pat_filter_A")).toBe(true);
+    expect(list.length).toBeGreaterThan(0);
   });
 
   it("POST /v1/appointments returns 400 when required fields are missing", async () => {
@@ -282,6 +310,15 @@ describe("Billing invoices", () => {
     const inv = (body as Record<string, unknown>).data as Record<string, unknown>;
     expect(inv.status).toBe("draft");
     expect(inv.totalAmountCents).toBe(15000);
+  });
+
+  it("GET /v1/billing/invoices?patientId= filters by patient", async () => {
+    await request(port, "POST", "/v1/billing/invoices", { patientId: "pat_inv_filter", totalAmountCents: 1000 });
+    await request(port, "POST", "/v1/billing/invoices", { patientId: "pat_inv_other", totalAmountCents: 2000 });
+    const { body } = await request(port, "GET", "/v1/billing/invoices?patientId=pat_inv_filter");
+    const list = (body as Record<string, unknown>).data as Record<string, unknown>[];
+    expect(list.every((i) => i.patientId === "pat_inv_filter")).toBe(true);
+    expect(list.length).toBeGreaterThan(0);
   });
 
   it("POST /v1/billing/invoices returns 400 when required fields are missing", async () => {
@@ -386,6 +423,19 @@ describe("Finance entries", () => {
     const entry = (body as Record<string, unknown>).data as Record<string, unknown>;
     expect(entry.direction).toBe("receivable");
     expect(entry.status).toBe("open");
+  });
+
+  it("GET /v1/finance/entries?direction= filters by direction", async () => {
+    await request(port, "POST", "/v1/finance/entries", {
+      direction: "receivable", description: "Entrada filtro", amountCents: 1000, dueDate: "2025-09-01"
+    });
+    await request(port, "POST", "/v1/finance/entries", {
+      direction: "payable", description: "Saída filtro", amountCents: 500, dueDate: "2025-09-01"
+    });
+    const { body } = await request(port, "GET", "/v1/finance/entries?direction=receivable");
+    const list = (body as Record<string, unknown>).data as Record<string, unknown>[];
+    expect(list.every((e) => e.direction === "receivable")).toBe(true);
+    expect(list.length).toBeGreaterThan(0);
   });
 
   it("POST /v1/finance/entries returns 400 for invalid direction", async () => {

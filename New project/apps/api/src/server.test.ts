@@ -1,5 +1,5 @@
 import { createServer } from "node:http";
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, vi, beforeAll, afterAll } from "vitest";
 import { createApp } from "./server.ts";
 import { createInMemoryStore } from "./store/in-memory-store.ts";
 
@@ -662,5 +662,43 @@ describe("Unknown routes", () => {
   it("GET unknown path returns 404", async () => {
     const { status } = await request(port, "GET", "/v1/does-not-exist");
     expect(status).toBe(404);
+  });
+});
+
+describe("Error logging", () => {
+  it("returns 500 and logs the error when the store throws", async () => {
+    const brokenStore = createInMemoryStore();
+    (brokenStore.patients as unknown as Record<string, unknown>).list = () => {
+      throw new Error("store exploded");
+    };
+
+    const app = createApp(brokenStore);
+    const server = createServer((req, res) => { app.handle(req, res); });
+    const testPort = await new Promise<number>((resolve) => {
+      server.listen(0, "127.0.0.1", () => {
+        resolve((server.address() as { port: number }).port);
+      });
+    });
+
+    const lines: string[] = [];
+    const spy = vi.spyOn(process.stdout, "write").mockImplementation((chunk) => {
+      lines.push(String(chunk));
+      return true;
+    });
+
+    try {
+      const res = await fetch(`http://127.0.0.1:${testPort}/v1/patients`);
+      expect(res.status).toBe(500);
+      const body = await res.json() as Record<string, unknown>;
+      expect((body.error as Record<string, unknown>).code).toBe("internal_error");
+
+      const errorLog = lines.map((l) => { try { return JSON.parse(l) as Record<string, unknown>; } catch { return null; } })
+        .find((e) => e?.level === "error");
+      expect(errorLog).toBeDefined();
+      expect(errorLog!.error).toBe("store exploded");
+    } finally {
+      spy.mockRestore();
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
   });
 });

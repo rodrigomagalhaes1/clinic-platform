@@ -4,6 +4,7 @@ import { modules } from "./modules/index.ts";
 import { createSqliteStore } from "./store/sqlite-store.ts";
 import { createInMemoryStore } from "./store/in-memory-store.ts";
 import { BadRequestError, badRequest, created, deleted, json, noContent, notFound, parseJsonBody } from "./support/http.ts";
+import { log } from "./support/logger.ts";
 import { createId, optionalString } from "@clinic/shared";
 
 export type AppStore = ReturnType<typeof createInMemoryStore>;
@@ -383,6 +384,12 @@ export function createApp(store: AppStore = createSqliteStore()) {
         return json(response, 400, { error: { code: "bad_request", message: error.message } });
       }
       const message = error instanceof Error ? error.message : "Unexpected error";
+      log("error", "unhandled error", {
+        method,
+        url: url.pathname,
+        error: message,
+        stack: error instanceof Error ? error.stack : undefined
+      });
       return json(response, 500, { error: { code: "internal_error", message } });
     }
   }

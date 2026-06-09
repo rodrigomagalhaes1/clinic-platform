@@ -4,8 +4,7 @@ import { modules } from "./modules/index.ts";
 import { createSqliteStore } from "./store/sqlite-store.ts";
 import { createInMemoryStore } from "./store/in-memory-store.ts";
 import { BadRequestError, badRequest, created, json, noContent, notFound, parseJsonBody } from "./support/http.ts";
-import { createId } from "./support/id.ts";
-import { optionalString } from "@clinic/shared";
+import { createId, optionalString } from "@clinic/shared";
 
 export type AppStore = ReturnType<typeof createInMemoryStore>;
 

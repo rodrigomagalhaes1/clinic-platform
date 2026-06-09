@@ -44,6 +44,13 @@ export function createApp(store: AppStore = createSqliteStore()) {
         return json(response, 200, { data: store.patients.list() });
       }
 
+      const patientMatch = url.pathname.match(/^\/v1\/patients\/([^/]+)$/);
+      if (method === "GET" && patientMatch) {
+        const patient = store.patients.get(patientMatch[1] ?? "");
+        if (!patient) return notFound(response);
+        return json(response, 200, { data: patient });
+      }
+
       if (method === "POST" && url.pathname === "/v1/patients") {
         const body = await parseJsonBody(request);
 
@@ -67,6 +74,13 @@ export function createApp(store: AppStore = createSqliteStore()) {
 
       if (method === "GET" && url.pathname === "/v1/appointments") {
         return json(response, 200, { data: store.appointments.list() });
+      }
+
+      const appointmentMatch = url.pathname.match(/^\/v1\/appointments\/([^/]+)$/);
+      if (method === "GET" && appointmentMatch) {
+        const appointment = store.appointments.get(appointmentMatch[1] ?? "");
+        if (!appointment) return notFound(response);
+        return json(response, 200, { data: appointment });
       }
 
       const appointmentStatusMatch = url.pathname.match(/^\/v1\/appointments\/([^/]+)\/status$/);

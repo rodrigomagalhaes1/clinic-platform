@@ -134,6 +134,22 @@ describe("Patients", () => {
     const list = (body as Record<string, unknown>).data as unknown[];
     expect(list.some((p) => (p as Record<string, unknown>).fullName === "João Costa")).toBe(true);
   });
+
+  it("GET /v1/patients/:id returns the patient", async () => {
+    const create = await request(port, "POST", "/v1/patients", { fullName: "Carla Mendes" });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const { status, body } = await request(port, "GET", `/v1/patients/${id}`);
+    expect(status).toBe(200);
+    const patient = (body as Record<string, unknown>).data as Record<string, unknown>;
+    expect(patient.id).toBe(id);
+    expect(patient.fullName).toBe("Carla Mendes");
+  });
+
+  it("GET /v1/patients/:id returns 404 for unknown id", async () => {
+    const { status } = await request(port, "GET", "/v1/patients/nonexistent_id");
+    expect(status).toBe(404);
+  });
 });
 
 describe("Appointments", () => {
@@ -161,6 +177,27 @@ describe("Appointments", () => {
       patientId: "pat_123"
     });
     expect(status).toBe(400);
+  });
+
+  it("GET /v1/appointments/:id returns the appointment", async () => {
+    const create = await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_getbyid",
+      professionalId: "pro_getbyid",
+      startsAt: "2026-10-01T09:00:00.000Z",
+      endsAt: "2026-10-01T09:30:00.000Z"
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const { status, body } = await request(port, "GET", `/v1/appointments/${id}`);
+    expect(status).toBe(200);
+    const appt = (body as Record<string, unknown>).data as Record<string, unknown>;
+    expect(appt.id).toBe(id);
+    expect(appt.patientId).toBe("pat_getbyid");
+  });
+
+  it("GET /v1/appointments/:id returns 404 for unknown id", async () => {
+    const { status } = await request(port, "GET", "/v1/appointments/nonexistent_id");
+    expect(status).toBe(404);
   });
 });
 

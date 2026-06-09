@@ -9,6 +9,18 @@ import { createId, optionalString } from "@clinic/shared";
 
 export type AppStore = ReturnType<typeof createInMemoryStore>;
 
+function parseDate(value: unknown, fieldName: string): Date {
+  const d = new Date(String(value));
+  if (isNaN(d.getTime())) throw new BadRequestError(`${fieldName} must be a valid ISO date`);
+  return d;
+}
+
+function parsePositiveInt(value: unknown, fieldName: string): number {
+  const n = Number(value);
+  if (!Number.isInteger(n) || n <= 0) throw new BadRequestError(`${fieldName} must be a positive integer`);
+  return n;
+}
+
 function paginate<T>(items: T[], searchParams: URLSearchParams) {
   const limit = Math.min(Math.max(Number(searchParams.get("limit") ?? 100), 1), 500);
   const offset = Math.max(Number(searchParams.get("offset") ?? 0), 0);
@@ -199,6 +211,12 @@ export function createApp(store: AppStore = createSqliteStore()) {
           return badRequest(response, `${missing} is required`);
         }
 
+        const startsAt = parseDate(body.startsAt, "startsAt");
+        const endsAt = parseDate(body.endsAt, "endsAt");
+        if (startsAt >= endsAt) {
+          return badRequest(response, "endsAt must be after startsAt");
+        }
+
         const appointment = store.appointments.create({
           id: createId("apt"),
           clinicId: getClinicId(request),
@@ -212,8 +230,8 @@ export function createApp(store: AppStore = createSqliteStore()) {
           planName: optionalString(body.planName),
           roomName: optionalString(body.roomName) ?? "Sala 01",
           attendanceType: optionalString(body.attendanceType) ?? "scheduled",
-          startsAt: new Date(String(body.startsAt)),
-          endsAt: new Date(String(body.endsAt)),
+          startsAt,
+          endsAt,
           status: "scheduled"
         });
 
@@ -267,9 +285,10 @@ export function createApp(store: AppStore = createSqliteStore()) {
       if (method === "POST" && url.pathname === "/v1/billing/invoices") {
         const body = await parseJsonBody(request);
 
-        if (!body.patientId || !body.totalAmountCents) {
-          return badRequest(response, "patientId and totalAmountCents are required");
+        if (!body.patientId) {
+          return badRequest(response, "patientId is required");
         }
+        const totalAmountCents = parsePositiveInt(body.totalAmountCents, "totalAmountCents");
 
         const invoice = store.invoices.create({
           id: createId("inv"),
@@ -278,7 +297,7 @@ export function createApp(store: AppStore = createSqliteStore()) {
           appointmentId: optionalString(body.appointmentId),
           payerType: body.payerType === "insurance" ? "insurance" : "private",
           status: "draft",
-          totalAmountCents: Number(body.totalAmountCents),
+          totalAmountCents,
           createdAt: new Date()
         });
 
@@ -345,6 +364,7 @@ export function createApp(store: AppStore = createSqliteStore()) {
         if (body.direction !== "receivable" && body.direction !== "payable") {
           return badRequest(response, "direction must be receivable or payable");
         }
+        const amountCents = parsePositiveInt(body.amountCents, "amountCents");
 
         const entry = store.financialEntries.create({
           id: createId("fin"),
@@ -352,7 +372,7 @@ export function createApp(store: AppStore = createSqliteStore()) {
           direction: body.direction,
           category: optionalString(body.category) ?? "manual",
           description: String(body.description),
-          amountCents: Number(body.amountCents),
+          amountCents,
           dueDate: String(body.dueDate),
           status: optionalString(body.status) === "paid" || optionalString(body.status) === "cancelled"
             ? optionalString(body.status) as "paid" | "cancelled"

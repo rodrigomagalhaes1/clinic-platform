@@ -283,6 +283,28 @@ describe("Appointments", () => {
     expect(status).toBe(400);
   });
 
+  it("POST /v1/appointments returns 400 when endsAt is before startsAt", async () => {
+    const { status, body } = await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_val",
+      professionalId: "pro_val",
+      startsAt: "2026-07-01T10:00:00Z",
+      endsAt: "2026-07-01T09:00:00Z"
+    });
+    expect(status).toBe(400);
+    expect(((body as Record<string, unknown>).error as Record<string, unknown>).message)
+      .toContain("endsAt");
+  });
+
+  it("POST /v1/appointments returns 400 for invalid date string", async () => {
+    const { status } = await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_val",
+      professionalId: "pro_val",
+      startsAt: "not-a-date",
+      endsAt: "2026-07-01T10:00:00Z"
+    });
+    expect(status).toBe(400);
+  });
+
   it("GET /v1/appointments/:id returns the appointment", async () => {
     const create = await request(port, "POST", "/v1/appointments", {
       patientId: "pat_getbyid",
@@ -386,6 +408,17 @@ describe("Billing invoices", () => {
       patientId: "pat_123"
     });
     expect(status).toBe(400);
+  });
+
+  it("POST /v1/billing/invoices returns 400 for zero or negative totalAmountCents", async () => {
+    const { status: s1 } = await request(port, "POST", "/v1/billing/invoices", {
+      patientId: "pat_val", totalAmountCents: 0
+    });
+    expect(s1).toBe(400);
+    const { status: s2 } = await request(port, "POST", "/v1/billing/invoices", {
+      patientId: "pat_val", totalAmountCents: -100
+    });
+    expect(s2).toBe(400);
   });
 
   it("GET /v1/billing/invoices/:id returns the invoice", async () => {
@@ -506,6 +539,14 @@ describe("Finance entries", () => {
       dueDate: "2026-07-31"
     });
     expect(status).toBe(400);
+  });
+
+  it("POST /v1/finance/entries returns 400 for zero or negative amountCents", async () => {
+    const base = { direction: "receivable", description: "Test", dueDate: "2026-07-31" };
+    const { status: s1 } = await request(port, "POST", "/v1/finance/entries", { ...base, amountCents: 0 });
+    expect(s1).toBe(400);
+    const { status: s2 } = await request(port, "POST", "/v1/finance/entries", { ...base, amountCents: -50 });
+    expect(s2).toBe(400);
   });
 
   it("GET /v1/finance/entries/:id returns the entry", async () => {

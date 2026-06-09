@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { normalize, escapeHtml, toCurrencyFromCents, formatDate, parseList, toLocalDateTime, optionalString } from "./index";
+import { normalize, escapeHtml, toCurrencyFromCents, formatDate, parseList, toLocalDateTime, optionalString, createId } from "./index";
 
 describe("normalize", () => {
   it("remove acentos e converte para minúsculas", () => {
@@ -163,5 +163,25 @@ describe("optionalString", () => {
     expect(optionalString(true)).toBeUndefined();
     expect(optionalString([])).toBeUndefined();
     expect(optionalString({})).toBeUndefined();
+  });
+});
+
+describe("createId", () => {
+  it("retorna string com o prefixo correto", () => {
+    expect(createId("pat")).toMatch(/^pat_/);
+    expect(createId("apt")).toMatch(/^apt_/);
+    expect(createId("fin")).toMatch(/^fin_/);
+  });
+
+  it("formato é prefix_uuid", () => {
+    const id = createId("test");
+    const [prefix, uuid] = id.split("_", 2);
+    expect(prefix).toBe("test");
+    expect(uuid).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+  });
+
+  it("IDs gerados são únicos", () => {
+    const ids = Array.from({ length: 100 }, () => createId("x"));
+    expect(new Set(ids).size).toBe(100);
   });
 });

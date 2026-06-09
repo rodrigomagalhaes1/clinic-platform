@@ -75,6 +75,16 @@ export function optionalString(value) {
     return typeof value === "string" && value.length > 0 ? value : undefined;
 }
 /**
+ * Gera um ID único com prefixo legível usando crypto.randomUUID().
+ * O formato é `<prefix>_<uuid>`, onde o UUID é gerado pelo runtime.
+ *
+ * @example createId("pat") // "pat_550e8400-e29b-41d4-a716-446655440000"
+ * @example createId("apt") // "apt_f47ac10b-58cc-4372-a567-0e02b2c3d479"
+ */
+export function createId(prefix) {
+    return `${prefix}_${crypto.randomUUID()}`;
+}
+/**
  * Normaliza uma string para comparações case-insensitive sem acento.
  * Remove diacríticos (NFD) e converte para minúsculas.
  *

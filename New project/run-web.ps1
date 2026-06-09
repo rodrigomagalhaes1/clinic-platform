@@ -2,7 +2,7 @@ $ProjectDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $NodeCommand = Get-Command node -ErrorAction SilentlyContinue
 
 if (-not $NodeCommand) {
-  Write-Error "Node.js nao foi encontrado. Instale o Node.js 20 ou superior."
+  Write-Error "Node.js nao foi encontrado. Instale o Node.js 22 ou superior."
   exit 1
 }
 

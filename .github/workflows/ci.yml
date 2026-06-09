@@ -94,3 +94,25 @@ jobs:
       - name: Lint
         run: npm run lint
         working-directory: "New project"
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: "New project/package-lock.json"
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: "New project"
+
+      - name: Coverage report
+        run: npm run coverage
+        working-directory: "New project"

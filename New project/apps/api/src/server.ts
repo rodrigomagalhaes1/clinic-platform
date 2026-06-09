@@ -374,6 +374,46 @@ export function createApp(store: AppStore = createSqliteStore()) {
         return json(response, 200, { data: updated });
       }
 
+      if (method === "GET" && url.pathname === "/v1/stats") {
+        const patients = store.patients.list();
+        const appointments = store.appointments.list();
+        const invoices = store.invoices.list();
+        const entries = store.financialEntries.list();
+
+        const countBy = <T>(items: T[], key: keyof T) => {
+          const result: Record<string, number> = {};
+          for (const item of items) {
+            const value = String(item[key] ?? "unknown");
+            result[value] = (result[value] ?? 0) + 1;
+          }
+          return result;
+        };
+
+        const totalCents = (items: { amountCents: number }[]) =>
+          items.reduce((sum, e) => sum + e.amountCents, 0);
+
+        return json(response, 200, {
+          data: {
+            patients: { total: patients.length },
+            appointments: {
+              total: appointments.length,
+              byStatus: countBy(appointments, "status")
+            },
+            invoices: {
+              total: invoices.length,
+              byStatus: countBy(invoices, "status"),
+              totalAmountCents: invoices.reduce((sum, i) => sum + i.totalAmountCents, 0)
+            },
+            finance: {
+              total: entries.length,
+              receivableCents: totalCents(entries.filter((e) => e.direction === "receivable")),
+              payableCents: totalCents(entries.filter((e) => e.direction === "payable")),
+              byStatus: countBy(entries, "status")
+            }
+          }
+        });
+      }
+
       if (method === "GET" && url.pathname === "/v1/agents") {
         return json(response, 200, { data: initialAgents });
       }

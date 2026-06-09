@@ -702,3 +702,53 @@ describe("Error logging", () => {
     }
   });
 });
+
+describe("GET /v1/stats", () => {
+  it("returns summary counts for all resources", async () => {
+    await request(port, "POST", "/v1/patients", { fullName: "Stats Patient" });
+    await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_stats",
+      professionalId: "pro_stats",
+      startsAt: "2026-08-01T10:00:00Z",
+      endsAt: "2026-08-01T10:30:00Z"
+    });
+    await request(port, "POST", "/v1/billing/invoices", {
+      patientId: "pat_stats",
+      totalAmountCents: 10000
+    });
+    await request(port, "POST", "/v1/finance/entries", {
+      direction: "receivable",
+      description: "Stats entry",
+      amountCents: 5000,
+      dueDate: "2026-08-01"
+    });
+
+    const { status, body } = await request(port, "GET", "/v1/stats");
+    expect(status).toBe(200);
+
+    const data = (body as Record<string, unknown>).data as Record<string, unknown>;
+    expect(typeof (data.patients as Record<string, unknown>).total).toBe("number");
+    expect(typeof (data.appointments as Record<string, unknown>).total).toBe("number");
+    expect(typeof (data.invoices as Record<string, unknown>).totalAmountCents).toBe("number");
+
+    const finance = data.finance as Record<string, unknown>;
+    expect(typeof finance.receivableCents).toBe("number");
+    expect(typeof finance.payableCents).toBe("number");
+    expect((finance.receivableCents as number)).toBeGreaterThanOrEqual(5000);
+  });
+
+  it("byStatus counts appointments by status", async () => {
+    await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_bystatus",
+      professionalId: "pro_bystatus",
+      startsAt: "2026-09-01T09:00:00Z",
+      endsAt: "2026-09-01T09:30:00Z"
+    });
+
+    const { body } = await request(port, "GET", "/v1/stats");
+    const appts = ((body as Record<string, unknown>).data as Record<string, unknown>).appointments as Record<string, unknown>;
+    const byStatus = appts.byStatus as Record<string, number>;
+    expect(typeof byStatus.scheduled).toBe("number");
+    expect(byStatus.scheduled).toBeGreaterThanOrEqual(1);
+  });
+});

@@ -235,6 +235,47 @@ describe("Appointments", () => {
     expect(list.length).toBeGreaterThan(0);
   });
 
+  it("GET /v1/appointments?date= filters to a single calendar day", async () => {
+    await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_date_filter",
+      professionalId: "pro_date",
+      startsAt: "2027-03-15T08:00:00Z",
+      endsAt: "2027-03-15T08:30:00Z"
+    });
+    await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_date_filter",
+      professionalId: "pro_date",
+      startsAt: "2027-03-16T08:00:00Z",
+      endsAt: "2027-03-16T08:30:00Z"
+    });
+
+    const { body } = await request(port, "GET", "/v1/appointments?date=2027-03-15");
+    const list = (body as Record<string, unknown>).data as Record<string, unknown>[];
+    expect(list.length).toBeGreaterThan(0);
+    expect(list.every((a) => (a.startsAt as string).startsWith("2027-03-15"))).toBe(true);
+  });
+
+  it("GET /v1/appointments?from=&to= filters by date range", async () => {
+    await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_range",
+      professionalId: "pro_range",
+      startsAt: "2027-05-10T10:00:00Z",
+      endsAt: "2027-05-10T10:30:00Z"
+    });
+    await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_range",
+      professionalId: "pro_range",
+      startsAt: "2027-06-20T10:00:00Z",
+      endsAt: "2027-06-20T10:30:00Z"
+    });
+
+    const { body } = await request(port, "GET", "/v1/appointments?from=2027-05-01&to=2027-05-31");
+    const list = (body as Record<string, unknown>).data as Record<string, unknown>[];
+    expect(list.length).toBeGreaterThan(0);
+    const starts = list.map((a) => (a.startsAt as string).slice(0, 7));
+    expect(starts.every((m) => m === "2027-05")).toBe(true);
+  });
+
   it("POST /v1/appointments returns 400 when required fields are missing", async () => {
     const { status } = await request(port, "POST", "/v1/appointments", {
       patientId: "pat_123"

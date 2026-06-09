@@ -103,10 +103,28 @@ export function createApp(store: AppStore = createSqliteStore()) {
         const patientId = url.searchParams.get("patientId");
         const professionalId = url.searchParams.get("professionalId");
         const status = url.searchParams.get("status");
+        const date = url.searchParams.get("date");     // exact calendar day: YYYY-MM-DD
+        const from = url.searchParams.get("from");     // range start: YYYY-MM-DD (inclusive)
+        const to = url.searchParams.get("to");         // range end:   YYYY-MM-DD (inclusive)
+
         let appointments = store.appointments.list();
         if (patientId) appointments = appointments.filter((a) => a.patientId === patientId);
         if (professionalId) appointments = appointments.filter((a) => a.professionalId === professionalId);
         if (status) appointments = appointments.filter((a) => a.status === status);
+        if (date) {
+          appointments = appointments.filter((a) => {
+            const d = new Date(a.startsAt);
+            return d.toISOString().slice(0, 10) === date;
+          });
+        }
+        if (from) {
+          const fromTs = new Date(from).getTime();
+          appointments = appointments.filter((a) => new Date(a.startsAt).getTime() >= fromTs);
+        }
+        if (to) {
+          const toTs = new Date(to + "T23:59:59.999Z").getTime();
+          appointments = appointments.filter((a) => new Date(a.startsAt).getTime() <= toTs);
+        }
         return json(response, 200, paginate(appointments, url.searchParams));
       }
 
@@ -275,6 +293,10 @@ export function createApp(store: AppStore = createSqliteStore()) {
         if (direction) entries = entries.filter((e) => e.direction === direction);
         if (status) entries = entries.filter((e) => e.status === status);
         if (costCenter) entries = entries.filter((e) => e.costCenter === costCenter);
+        const from = url.searchParams.get("from");
+        const to = url.searchParams.get("to");
+        if (from) entries = entries.filter((e) => e.dueDate >= from);
+        if (to) entries = entries.filter((e) => e.dueDate <= to);
         return json(response, 200, paginate(entries, url.searchParams));
       }
 

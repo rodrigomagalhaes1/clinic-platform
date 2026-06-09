@@ -144,6 +144,25 @@ describe("Patients", () => {
     expect(list.length).toBeGreaterThan(0);
   });
 
+  it("GET /v1/patients?limit=&offset= paginates results", async () => {
+    // Create 3 patients to ensure enough data
+    await request(port, "POST", "/v1/patients", { fullName: "Paginacao Um" });
+    await request(port, "POST", "/v1/patients", { fullName: "Paginacao Dois" });
+    await request(port, "POST", "/v1/patients", { fullName: "Paginacao Tres" });
+
+    const page1 = await request(port, "GET", "/v1/patients?limit=2&offset=0");
+    const b1 = page1.body as Record<string, unknown>;
+    expect((b1.data as unknown[]).length).toBeLessThanOrEqual(2);
+    expect(typeof b1.total).toBe("number");
+    expect(b1.limit).toBe(2);
+    expect(b1.offset).toBe(0);
+
+    const page2 = await request(port, "GET", "/v1/patients?limit=2&offset=2");
+    const b2 = page2.body as Record<string, unknown>;
+    expect(b2.offset).toBe(2);
+    expect((b1.total as number)).toBeGreaterThanOrEqual(3);
+  });
+
   it("GET /v1/patients/:id returns the patient", async () => {
     const create = await request(port, "POST", "/v1/patients", { fullName: "Carla Mendes" });
     const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;

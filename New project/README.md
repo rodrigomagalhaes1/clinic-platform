@@ -86,13 +86,13 @@ npm test --workspace packages/agents
 npm test --workspace apps/api
 ```
 
-**97 testes** distribuídos entre os pacotes:
+**128 testes** distribuídos entre os pacotes:
 
 | Pacote | Testes |
 |---|---|
-| `@clinic/shared` | 58 — funções utilitárias |
+| `@clinic/shared` | 70 — funções utilitárias |
 | `@clinic/agents` | 12 — estrutura e políticas dos agentes |
-| `@clinic/api` | 27 — integração HTTP de todos os endpoints |
+| `@clinic/api` | 46 — integração HTTP + testes unitários de suporte |
 
 ## CI
 

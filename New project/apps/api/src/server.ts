@@ -146,6 +146,13 @@ export function createApp(store: AppStore = createSqliteStore()) {
         return json(response, 200, { data: store.invoices.list() });
       }
 
+      const invoiceMatch = url.pathname.match(/^\/v1\/billing\/invoices\/([^/]+)$/);
+      if (method === "GET" && invoiceMatch) {
+        const invoice = store.invoices.get(invoiceMatch[1] ?? "");
+        if (!invoice) return notFound(response);
+        return json(response, 200, { data: invoice });
+      }
+
       if (method === "POST" && url.pathname === "/v1/billing/invoices") {
         const body = await parseJsonBody(request);
 
@@ -169,6 +176,13 @@ export function createApp(store: AppStore = createSqliteStore()) {
 
       if (method === "GET" && url.pathname === "/v1/finance/entries") {
         return json(response, 200, { data: store.financialEntries.list() });
+      }
+
+      const financeEntryMatch = url.pathname.match(/^\/v1\/finance\/entries\/([^/]+)$/);
+      if (method === "GET" && financeEntryMatch) {
+        const entry = store.financialEntries.get(financeEntryMatch[1] ?? "");
+        if (!entry) return notFound(response);
+        return json(response, 200, { data: entry });
       }
 
       if (method === "POST" && url.pathname === "/v1/finance/entries") {

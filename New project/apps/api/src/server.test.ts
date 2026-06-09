@@ -225,6 +225,25 @@ describe("Billing invoices", () => {
     });
     expect(status).toBe(400);
   });
+
+  it("GET /v1/billing/invoices/:id returns the invoice", async () => {
+    const create = await request(port, "POST", "/v1/billing/invoices", {
+      patientId: "pat_inv_getbyid",
+      totalAmountCents: 25000
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const { status, body } = await request(port, "GET", `/v1/billing/invoices/${id}`);
+    expect(status).toBe(200);
+    const inv = (body as Record<string, unknown>).data as Record<string, unknown>;
+    expect(inv.id).toBe(id);
+    expect(inv.totalAmountCents).toBe(25000);
+  });
+
+  it("GET /v1/billing/invoices/:id returns 404 for unknown id", async () => {
+    const { status } = await request(port, "GET", "/v1/billing/invoices/nonexistent_id");
+    expect(status).toBe(404);
+  });
 });
 
 describe("Finance entries", () => {
@@ -255,6 +274,27 @@ describe("Finance entries", () => {
       dueDate: "2026-07-31"
     });
     expect(status).toBe(400);
+  });
+
+  it("GET /v1/finance/entries/:id returns the entry", async () => {
+    const create = await request(port, "POST", "/v1/finance/entries", {
+      direction: "receivable",
+      description: "Consulta get-by-id",
+      amountCents: 18000,
+      dueDate: "2026-09-30"
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const { status, body } = await request(port, "GET", `/v1/finance/entries/${id}`);
+    expect(status).toBe(200);
+    const entry = (body as Record<string, unknown>).data as Record<string, unknown>;
+    expect(entry.id).toBe(id);
+    expect(entry.amountCents).toBe(18000);
+  });
+
+  it("GET /v1/finance/entries/:id returns 404 for unknown id", async () => {
+    const { status } = await request(port, "GET", "/v1/finance/entries/nonexistent_id");
+    expect(status).toBe(404);
   });
 });
 

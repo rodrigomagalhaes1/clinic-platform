@@ -58,6 +58,7 @@ export type MedicalInvoice = {
   status: InvoiceStatus;
   totalAmountCents: number;
   createdAt: Date;
+  updatedAt?: Date;
 };
 
 export type FinancialEntry = {

@@ -328,6 +328,44 @@ describe("Billing invoices", () => {
     const { status } = await request(port, "DELETE", "/v1/billing/invoices/nonexistent_id");
     expect(status).toBe(404);
   });
+
+  it("PATCH /v1/billing/invoices/:id updates invoice fields", async () => {
+    const create = await request(port, "POST", "/v1/billing/invoices", {
+      patientId: "pat_inv_patch",
+      totalAmountCents: 10000
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const { status, body } = await request(port, "PATCH", `/v1/billing/invoices/${id}`, {
+      status: "ready",
+      totalAmountCents: 12000
+    });
+    expect(status).toBe(200);
+    const inv = (body as Record<string, unknown>).data as Record<string, unknown>;
+    expect(inv.status).toBe("ready");
+    expect(inv.totalAmountCents).toBe(12000);
+    expect(inv.patientId).toBe("pat_inv_patch");
+  });
+
+  it("PATCH /v1/billing/invoices/:id returns 400 for invalid status", async () => {
+    const create = await request(port, "POST", "/v1/billing/invoices", {
+      patientId: "pat_inv_400",
+      totalAmountCents: 5000
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const { status } = await request(port, "PATCH", `/v1/billing/invoices/${id}`, {
+      status: "invalid_status"
+    });
+    expect(status).toBe(400);
+  });
+
+  it("PATCH /v1/billing/invoices/:id returns 404 for unknown id", async () => {
+    const { status } = await request(port, "PATCH", "/v1/billing/invoices/nonexistent_id", {
+      totalAmountCents: 999
+    });
+    expect(status).toBe(404);
+  });
 });
 
 describe("Finance entries", () => {
@@ -399,6 +437,35 @@ describe("Finance entries", () => {
 
   it("DELETE /v1/finance/entries/:id returns 404 for unknown id", async () => {
     const { status } = await request(port, "DELETE", "/v1/finance/entries/nonexistent_id");
+    expect(status).toBe(404);
+  });
+
+  it("PATCH /v1/finance/entries/:id updates entry fields", async () => {
+    const create = await request(port, "POST", "/v1/finance/entries", {
+      direction: "payable",
+      description: "Despesa original",
+      amountCents: 5000,
+      dueDate: "2025-07-01"
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const { status, body } = await request(port, "PATCH", `/v1/finance/entries/${id}`, {
+      description: "Despesa atualizada",
+      amountCents: 7500,
+      notes: "Corrigido"
+    });
+    expect(status).toBe(200);
+    const entry = (body as Record<string, unknown>).data as Record<string, unknown>;
+    expect(entry.description).toBe("Despesa atualizada");
+    expect(entry.amountCents).toBe(7500);
+    expect(entry.notes).toBe("Corrigido");
+    expect(entry.direction).toBe("payable");
+  });
+
+  it("PATCH /v1/finance/entries/:id returns 404 for unknown id", async () => {
+    const { status } = await request(port, "PATCH", "/v1/finance/entries/nonexistent_id", {
+      description: "Qualquer"
+    });
     expect(status).toBe(404);
   });
 });

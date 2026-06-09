@@ -183,6 +183,29 @@ export function createApp(store: AppStore = createSqliteStore()) {
         if (!invoice) return notFound(response);
         return json(response, 200, { data: invoice });
       }
+      if (method === "PATCH" && invoiceMatch) {
+        const invoice = store.invoices.get(invoiceMatch[1] ?? "");
+        if (!invoice) return notFound(response);
+
+        const body = await parseJsonBody(request);
+        const allowedStatuses = new Set<string>(["draft", "ready", "submitted", "paid", "denied", "cancelled"]);
+        const nextStatus = optionalString(body.status);
+
+        if (nextStatus !== undefined && !allowedStatuses.has(nextStatus)) {
+          return badRequest(response, "Invalid invoice status");
+        }
+
+        const updated = store.invoices.create({
+          ...invoice,
+          status: (nextStatus as typeof invoice.status | undefined) ?? invoice.status,
+          totalAmountCents: typeof body.totalAmountCents === "number" ? body.totalAmountCents : invoice.totalAmountCents,
+          appointmentId: "appointmentId" in body ? optionalString(body.appointmentId) : invoice.appointmentId,
+          payerType: body.payerType === "insurance" || body.payerType === "private" ? body.payerType : invoice.payerType,
+          updatedAt: new Date()
+        });
+
+        return json(response, 200, { data: updated });
+      }
       if (method === "DELETE" && invoiceMatch) {
         const removed = store.invoices.remove(invoiceMatch[1] ?? "");
         if (!removed) return notFound(response);
@@ -219,6 +242,27 @@ export function createApp(store: AppStore = createSqliteStore()) {
         const entry = store.financialEntries.get(financeEntryMatch[1] ?? "");
         if (!entry) return notFound(response);
         return json(response, 200, { data: entry });
+      }
+      if (method === "PATCH" && financeEntryMatch) {
+        const entry = store.financialEntries.get(financeEntryMatch[1] ?? "");
+        if (!entry) return notFound(response);
+
+        const body = await parseJsonBody(request);
+        const updated = store.financialEntries.create({
+          ...entry,
+          description: typeof body.description === "string" && body.description.length > 0 ? body.description : entry.description,
+          amountCents: typeof body.amountCents === "number" ? body.amountCents : entry.amountCents,
+          dueDate: typeof body.dueDate === "string" && body.dueDate.length > 0 ? body.dueDate : entry.dueDate,
+          category: "category" in body ? (optionalString(body.category) ?? entry.category) : entry.category,
+          notes: "notes" in body ? optionalString(body.notes) : entry.notes,
+          costCenter: "costCenter" in body ? optionalString(body.costCenter) : entry.costCenter,
+          cashAccount: "cashAccount" in body ? optionalString(body.cashAccount) : entry.cashAccount,
+          paymentMethod: "paymentMethod" in body ? optionalString(body.paymentMethod) : entry.paymentMethod,
+          competenceMonth: "competenceMonth" in body ? optionalString(body.competenceMonth) : entry.competenceMonth,
+          updatedAt: new Date()
+        });
+
+        return json(response, 200, { data: updated });
       }
       if (method === "DELETE" && financeEntryMatch) {
         const removed = store.financialEntries.remove(financeEntryMatch[1] ?? "");

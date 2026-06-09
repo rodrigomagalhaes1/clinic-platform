@@ -7,7 +7,7 @@ export function json(response: ServerResponse, statusCode: number, payload: unkn
     "Content-Type": "application/json; charset=utf-8",
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type, X-Clinic-Id",
-    "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS"
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS"
   });
   response.end(JSON.stringify(payload, dateReplacer, 2));
 }
@@ -16,11 +16,20 @@ export function created(response: ServerResponse, payload: unknown) {
   return json(response, 201, { data: payload });
 }
 
+export function deleted(response: ServerResponse) {
+  response.writeHead(204, {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type, X-Clinic-Id",
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS"
+  });
+  response.end();
+}
+
 export function noContent(response: ServerResponse) {
   response.writeHead(204, {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type, X-Clinic-Id",
-    "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS"
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS"
   });
   response.end();
 }

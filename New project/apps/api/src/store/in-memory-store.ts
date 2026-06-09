@@ -13,6 +13,9 @@ function createCollection<T extends { id: string }>() {
     },
     get(id: string) {
       return rows.get(id);
+    },
+    remove(id: string) {
+      return rows.delete(id);
     }
   };
 }

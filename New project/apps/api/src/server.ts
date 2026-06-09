@@ -87,6 +87,27 @@ export function createApp(store: AppStore = createSqliteStore()) {
         if (!appointment) return notFound(response);
         return json(response, 200, { data: appointment });
       }
+      if (method === "PATCH" && appointmentMatch) {
+        const appointment = store.appointments.get(appointmentMatch[1] ?? "");
+        if (!appointment) return notFound(response);
+
+        const body = await parseJsonBody(request);
+        const updated = store.appointments.create({
+          ...appointment,
+          patientId: typeof body.patientId === "string" && body.patientId.length > 0 ? body.patientId : appointment.patientId,
+          professionalId: typeof body.professionalId === "string" && body.professionalId.length > 0 ? body.professionalId : appointment.professionalId,
+          startsAt: typeof body.startsAt === "string" ? new Date(body.startsAt) : appointment.startsAt,
+          endsAt: typeof body.endsAt === "string" ? new Date(body.endsAt) : appointment.endsAt,
+          procedureName: "procedureName" in body ? (optionalString(body.procedureName) ?? appointment.procedureName) : appointment.procedureName,
+          roomName: "roomName" in body ? (optionalString(body.roomName) ?? appointment.roomName) : appointment.roomName,
+          insuranceName: "insuranceName" in body ? (optionalString(body.insuranceName) ?? appointment.insuranceName) : appointment.insuranceName,
+          planName: "planName" in body ? optionalString(body.planName) : appointment.planName,
+          memberId: "memberId" in body ? optionalString(body.memberId) : appointment.memberId,
+          updatedAt: new Date()
+        });
+
+        return json(response, 200, { data: updated });
+      }
       if (method === "DELETE" && appointmentMatch) {
         const removed = store.appointments.remove(appointmentMatch[1] ?? "");
         if (!removed) return notFound(response);

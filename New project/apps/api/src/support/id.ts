@@ -1,4 +1,1 @@
-export function createId(prefix: string) {
-  return `${prefix}_${crypto.randomUUID()}`;
-}
-
+export { createId } from "@clinic/shared";

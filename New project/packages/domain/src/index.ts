@@ -16,6 +16,7 @@ export type Patient = {
   phone?: string;
   email?: string;
   createdAt: Date;
+  updatedAt?: Date;
 };
 
 export type AppointmentStatus =
@@ -43,6 +44,7 @@ export type Appointment = {
   startsAt: Date;
   endsAt: Date;
   status: AppointmentStatus;
+  updatedAt?: Date;
 };
 
 export type InvoiceStatus = "draft" | "ready" | "submitted" | "paid" | "denied" | "cancelled";

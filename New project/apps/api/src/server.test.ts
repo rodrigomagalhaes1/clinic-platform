@@ -236,6 +236,34 @@ describe("Appointments", () => {
     const { status } = await request(port, "DELETE", "/v1/appointments/nonexistent_id");
     expect(status).toBe(404);
   });
+
+  it("PATCH /v1/appointments/:id updates appointment fields", async () => {
+    const create = await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_patch",
+      professionalId: "pro_patch",
+      startsAt: "2025-06-01T09:00:00Z",
+      endsAt: "2025-06-01T09:30:00Z",
+      procedureName: "Consulta"
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const { status, body } = await request(port, "PATCH", `/v1/appointments/${id}`, {
+      procedureName: "Retorno",
+      roomName: "Sala 02"
+    });
+    expect(status).toBe(200);
+    const appt = (body as Record<string, unknown>).data as Record<string, unknown>;
+    expect(appt.procedureName).toBe("Retorno");
+    expect(appt.roomName).toBe("Sala 02");
+    expect(appt.patientId).toBe("pat_patch");
+  });
+
+  it("PATCH /v1/appointments/:id returns 404 for unknown id", async () => {
+    const { status } = await request(port, "PATCH", "/v1/appointments/nonexistent_id", {
+      procedureName: "Qualquer"
+    });
+    expect(status).toBe(404);
+  });
 });
 
 describe("Billing invoices", () => {

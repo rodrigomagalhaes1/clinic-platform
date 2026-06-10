@@ -613,6 +613,20 @@ describe("Billing invoices", () => {
     });
     expect(status).toBe(404);
   });
+
+  it("PATCH /v1/billing/invoices/:id returns 400 for zero or negative totalAmountCents", async () => {
+    const create = await request(port, "POST", "/v1/billing/invoices", {
+      patientId: "pat_inv_patch_400",
+      totalAmountCents: 5000
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const zero = await request(port, "PATCH", `/v1/billing/invoices/${id}`, { totalAmountCents: 0 });
+    expect(zero.status).toBe(400);
+
+    const negative = await request(port, "PATCH", `/v1/billing/invoices/${id}`, { totalAmountCents: -100 });
+    expect(negative.status).toBe(400);
+  });
 });
 
 describe("Finance entries", () => {
@@ -735,6 +749,45 @@ describe("Finance entries", () => {
       description: "Qualquer"
     });
     expect(status).toBe(404);
+  });
+
+  it("PATCH /v1/finance/entries/:id returns 400 for zero or negative amountCents", async () => {
+    const create = await request(port, "POST", "/v1/finance/entries", {
+      direction: "payable",
+      description: "Despesa validacao",
+      amountCents: 5000,
+      dueDate: "2025-07-01"
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const zero = await request(port, "PATCH", `/v1/finance/entries/${id}`, { amountCents: 0 });
+    expect(zero.status).toBe(400);
+
+    const negative = await request(port, "PATCH", `/v1/finance/entries/${id}`, { amountCents: -50 });
+    expect(negative.status).toBe(400);
+  });
+
+  it("PATCH /v1/finance/entries/:id returns 400 for an invalid dueDate", async () => {
+    const create = await request(port, "POST", "/v1/finance/entries", {
+      direction: "payable",
+      description: "Despesa data invalida",
+      amountCents: 5000,
+      dueDate: "2025-07-01"
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const { status } = await request(port, "PATCH", `/v1/finance/entries/${id}`, { dueDate: "not-a-date" });
+    expect(status).toBe(400);
+  });
+
+  it("POST /v1/finance/entries returns 400 for an invalid dueDate", async () => {
+    const { status } = await request(port, "POST", "/v1/finance/entries", {
+      direction: "receivable",
+      description: "Entrada data invalida",
+      amountCents: 1000,
+      dueDate: "not-a-date"
+    });
+    expect(status).toBe(400);
   });
 });
 

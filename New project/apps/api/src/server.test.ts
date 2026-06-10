@@ -908,6 +908,18 @@ describe("Malformed request body", () => {
     const body = await res.json() as Record<string, unknown>;
     expect((body.error as Record<string, unknown>).code).toBe("bad_request");
   });
+
+  it("POST with a body over 1MB returns 413", async () => {
+    const oversized = JSON.stringify({ fullName: "A".repeat(1024 * 1024 + 1) });
+    const res = await fetch(`http://127.0.0.1:${port}/v1/patients`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: oversized
+    });
+    expect(res.status).toBe(413);
+    const body = await res.json() as Record<string, unknown>;
+    expect((body.error as Record<string, unknown>).code).toBe("payload_too_large");
+  });
 });
 
 describe("Unknown routes", () => {

@@ -3,7 +3,7 @@ import { initialAgents } from "@clinic/agents";
 import { modules } from "./modules/index.ts";
 import { createSqliteStore } from "./store/sqlite-store.ts";
 import { createInMemoryStore } from "./store/in-memory-store.ts";
-import { BadRequestError, badRequest, created, deleted, json, noContent, notFound, parseJsonBody } from "./support/http.ts";
+import { BadRequestError, PayloadTooLargeError, badRequest, created, deleted, json, noContent, notFound, parseJsonBody, payloadTooLarge } from "./support/http.ts";
 import { log } from "./support/logger.ts";
 import { createId, optionalString } from "@clinic/shared";
 
@@ -546,6 +546,9 @@ export function createApp(store: AppStore = createSqliteStore()) {
     } catch (error) {
       if (error instanceof BadRequestError) {
         return json(response, 400, { error: { code: "bad_request", message: error.message } });
+      }
+      if (error instanceof PayloadTooLargeError) {
+        return payloadTooLarge(response, error.message);
       }
       const message = error instanceof Error ? error.message : "Unexpected error";
       log("error", "unhandled error", {

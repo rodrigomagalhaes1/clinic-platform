@@ -71,4 +71,9 @@ describe("createInMemoryStore", () => {
     expect(store.patients.remove("pat_del")).toBe(false);
     expect(store.patients.list()).toHaveLength(0);
   });
+
+  it("ping() returns true", () => {
+    const store = createInMemoryStore();
+    expect(store.ping()).toBe(true);
+  });
 });

@@ -44,10 +44,12 @@ export function createApp(store: AppStore = createSqliteStore()) {
       }
 
       if (method === "GET" && url.pathname === "/health") {
-        return json(response, 200, {
-          status: "ok",
+        const databaseOk = store.ping();
+        return json(response, databaseOk ? 200 : 503, {
+          status: databaseOk ? "ok" : "error",
           service: "clinic-automation-api",
           database: store.databasePath,
+          databaseOk,
           checkedAt: new Date().toISOString()
         });
       }

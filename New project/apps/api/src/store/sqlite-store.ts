@@ -1,5 +1,5 @@
-import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+import { mkdirSync, readdirSync, statSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import type { Appointment, FinancialEntry, MedicalInvoice, Patient } from "@clinic/domain";
 import { config } from "../config.ts";
@@ -92,7 +92,24 @@ export function createSqliteStore() {
     patients: createCollection<Patient>(database, "patients"),
     appointments: createCollection<Appointment>(database, "appointments"),
     invoices: createCollection<MedicalInvoice>(database, "invoices"),
-    financialEntries: createCollection<FinancialEntry>(database, "financial_entries")
+    financialEntries: createCollection<FinancialEntry>(database, "financial_entries"),
+    createBackup(): { filename: string; path: string } {
+      mkdirSync(config.backupsPath, { recursive: true });
+      const filename = `clinic-${new Date().toISOString().replace(/[:.]/g, "-")}.sqlite`;
+      const path = join(config.backupsPath, filename);
+      database.exec(`VACUUM INTO '${path.replace(/'/g, "''")}'`);
+      return { filename, path };
+    },
+    listBackups(): { filename: string; sizeBytes: number; createdAt: string }[] {
+      mkdirSync(config.backupsPath, { recursive: true });
+      return readdirSync(config.backupsPath)
+        .filter((filename) => filename.endsWith(".sqlite"))
+        .map((filename) => {
+          const stats = statSync(join(config.backupsPath, filename));
+          return { filename, sizeBytes: stats.size, createdAt: stats.birthtime.toISOString() };
+        })
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    }
   };
 }
 

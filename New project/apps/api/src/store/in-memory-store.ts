@@ -1,4 +1,5 @@
 import type { Appointment, FinancialEntry, MedicalInvoice, Patient } from "@clinic/domain";
+import { BadRequestError } from "../support/http.ts";
 
 type WithCreatedAt = { id: string; createdAt?: Date | string };
 
@@ -35,6 +36,12 @@ export function createInMemoryStore() {
     patients: createCollection<Patient>(),
     appointments: createCollection<Appointment>(),
     invoices: createCollection<MedicalInvoice>(),
-    financialEntries: createCollection<FinancialEntry>()
+    financialEntries: createCollection<FinancialEntry>(),
+    createBackup(): { filename: string; path: string } {
+      throw new BadRequestError("Backups are not supported for the in-memory database");
+    },
+    listBackups(): { filename: string; sizeBytes: number; createdAt: string }[] {
+      return [];
+    }
   };
 }

@@ -37,6 +37,26 @@ function findAppointmentConflict(
   );
 }
 
+function sortItems<T extends Record<string, unknown>>(items: T[], searchParams: URLSearchParams, allowedFields: string[]): T[] {
+  const sortBy = searchParams.get("sortBy");
+  if (!sortBy || !allowedFields.includes(sortBy)) return items;
+
+  const order = searchParams.get("sortOrder") === "desc" ? -1 : 1;
+
+  return items.slice().sort((a, b) => {
+    const av = a[sortBy];
+    const bv = b[sortBy];
+    if (av === undefined || av === null) return bv === undefined || bv === null ? 0 : 1;
+    if (bv === undefined || bv === null) return -1;
+
+    const an = av instanceof Date ? av.getTime() : av;
+    const bn = bv instanceof Date ? bv.getTime() : bv;
+    if (an < bn) return -1 * order;
+    if (an > bn) return 1 * order;
+    return 0;
+  });
+}
+
 function paginate<T>(items: T[], searchParams: URLSearchParams) {
   const limit = Math.min(Math.max(Number(searchParams.get("limit") ?? 100), 1), 500);
   const offset = Math.max(Number(searchParams.get("offset") ?? 0), 0);
@@ -93,6 +113,7 @@ export function createApp(store: AppStore = createSqliteStore()) {
             p.documentNumber?.includes(search)
           );
         }
+        patients = sortItems(patients, url.searchParams, ["fullName", "createdAt"]);
         return json(response, 200, paginate(patients, url.searchParams));
       }
 
@@ -155,6 +176,7 @@ export function createApp(store: AppStore = createSqliteStore()) {
           const toTs = new Date(to + "T23:59:59.999Z").getTime();
           appointments = appointments.filter((a) => new Date(a.startsAt).getTime() <= toTs);
         }
+        appointments = sortItems(appointments, url.searchParams, ["startsAt", "endsAt", "status", "createdAt"]);
         return json(response, 200, paginate(appointments, url.searchParams));
       }
 
@@ -281,6 +303,7 @@ export function createApp(store: AppStore = createSqliteStore()) {
         let invoices = store.invoices.list();
         if (patientId) invoices = invoices.filter((i) => i.patientId === patientId);
         if (status) invoices = invoices.filter((i) => i.status === status);
+        invoices = sortItems(invoices, url.searchParams, ["totalAmountCents", "status", "createdAt"]);
         return json(response, 200, paginate(invoices, url.searchParams));
       }
 
@@ -353,6 +376,7 @@ export function createApp(store: AppStore = createSqliteStore()) {
         const to = url.searchParams.get("to");
         if (from) entries = entries.filter((e) => e.dueDate >= from);
         if (to) entries = entries.filter((e) => e.dueDate <= to);
+        entries = sortItems(entries, url.searchParams, ["amountCents", "dueDate", "status", "createdAt"]);
         return json(response, 200, paginate(entries, url.searchParams));
       }
 

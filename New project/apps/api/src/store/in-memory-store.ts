@@ -31,6 +31,7 @@ function createCollection<T extends WithCreatedAt>() {
 export function createInMemoryStore() {
   return {
     databasePath: ":memory:",
+    ping: () => true,
     patients: createCollection<Patient>(),
     appointments: createCollection<Appointment>(),
     invoices: createCollection<MedicalInvoice>(),

@@ -68,7 +68,9 @@ describe("GET /health", () => {
   it("returns 200 with status ok", async () => {
     const { status, body } = await request(port, "GET", "/health");
     expect(status).toBe(200);
-    expect((body as Record<string, unknown>).status).toBe("ok");
+    const b = body as Record<string, unknown>;
+    expect(b.status).toBe("ok");
+    expect(b.databaseOk).toBe(true);
   });
 });
 

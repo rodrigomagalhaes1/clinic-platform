@@ -81,6 +81,14 @@ export function createSqliteStore() {
 
   return {
     databasePath,
+    ping: () => {
+      try {
+        database.prepare("select 1").get();
+        return true;
+      } catch {
+        return false;
+      }
+    },
     patients: createCollection<Patient>(database, "patients"),
     appointments: createCollection<Appointment>(database, "appointments"),
     invoices: createCollection<MedicalInvoice>(database, "invoices"),

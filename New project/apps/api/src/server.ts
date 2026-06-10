@@ -108,6 +108,15 @@ export function createApp(store: AppStore = createSqliteStore()) {
         return json(response, 200, { data: modules });
       }
 
+      if (method === "GET" && url.pathname === "/v1/admin/backups") {
+        return json(response, 200, { data: store.listBackups() });
+      }
+
+      if (method === "POST" && url.pathname === "/v1/admin/backups") {
+        const backup = store.createBackup();
+        return created(response, backup);
+      }
+
       if (method === "GET" && url.pathname === "/v1/patients") {
         const search = url.searchParams.get("search")?.toLowerCase();
         let patients = store.patients.list();

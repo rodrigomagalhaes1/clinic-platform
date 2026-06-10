@@ -1004,3 +1004,17 @@ describe("GET /v1/stats", () => {
     expect(byStatus.scheduled).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe("Database backups", () => {
+  it("GET /v1/admin/backups returns an empty list for the in-memory database", async () => {
+    const { status, body } = await request(port, "GET", "/v1/admin/backups");
+    expect(status).toBe(200);
+    expect((body as Record<string, unknown>).data).toEqual([]);
+  });
+
+  it("POST /v1/admin/backups returns 400 for the in-memory database", async () => {
+    const { status, body } = await request(port, "POST", "/v1/admin/backups");
+    expect(status).toBe(400);
+    expect(((body as Record<string, unknown>).error as Record<string, unknown>).message).toMatch(/in-memory/);
+  });
+});

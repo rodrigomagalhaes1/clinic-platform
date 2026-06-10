@@ -21,6 +21,12 @@ function parsePositiveInt(value: unknown, fieldName: string): number {
   return n;
 }
 
+function parseDateOnly(value: unknown, fieldName: string): string {
+  const s = String(value);
+  if (isNaN(new Date(s).getTime())) throw new BadRequestError(`${fieldName} must be a valid date`);
+  return s;
+}
+
 function findAppointmentConflict(
   appointments: { id: string; professionalId: string; startsAt: Date | string; endsAt: Date | string; status: string }[],
   professionalId: string,
@@ -325,10 +331,12 @@ export function createApp(store: AppStore = createSqliteStore()) {
           return badRequest(response, "Invalid invoice status");
         }
 
+        const totalAmountCents = "totalAmountCents" in body ? parsePositiveInt(body.totalAmountCents, "totalAmountCents") : invoice.totalAmountCents;
+
         const updated = store.invoices.create({
           ...invoice,
           status: (nextStatus as typeof invoice.status | undefined) ?? invoice.status,
-          totalAmountCents: typeof body.totalAmountCents === "number" ? body.totalAmountCents : invoice.totalAmountCents,
+          totalAmountCents,
           appointmentId: "appointmentId" in body ? optionalString(body.appointmentId) : invoice.appointmentId,
           payerType: body.payerType === "insurance" || body.payerType === "private" ? body.payerType : invoice.payerType,
           updatedAt: new Date()
@@ -391,11 +399,14 @@ export function createApp(store: AppStore = createSqliteStore()) {
         if (!entry) return notFound(response);
 
         const body = await parseJsonBody(request);
+        const amountCents = "amountCents" in body ? parsePositiveInt(body.amountCents, "amountCents") : entry.amountCents;
+        const dueDate = "dueDate" in body ? parseDateOnly(body.dueDate, "dueDate") : entry.dueDate;
+
         const updated = store.financialEntries.create({
           ...entry,
           description: typeof body.description === "string" && body.description.length > 0 ? body.description : entry.description,
-          amountCents: typeof body.amountCents === "number" ? body.amountCents : entry.amountCents,
-          dueDate: typeof body.dueDate === "string" && body.dueDate.length > 0 ? body.dueDate : entry.dueDate,
+          amountCents,
+          dueDate,
           category: "category" in body ? (optionalString(body.category) ?? entry.category) : entry.category,
           notes: "notes" in body ? optionalString(body.notes) : entry.notes,
           costCenter: "costCenter" in body ? optionalString(body.costCenter) : entry.costCenter,
@@ -426,6 +437,7 @@ export function createApp(store: AppStore = createSqliteStore()) {
           return badRequest(response, "direction must be receivable or payable");
         }
         const amountCents = parsePositiveInt(body.amountCents, "amountCents");
+        const dueDate = parseDateOnly(body.dueDate, "dueDate");
 
         const entry = store.financialEntries.create({
           id: createId("fin"),
@@ -434,7 +446,7 @@ export function createApp(store: AppStore = createSqliteStore()) {
           category: optionalString(body.category) ?? "manual",
           description: String(body.description),
           amountCents,
-          dueDate: String(body.dueDate),
+          dueDate,
           status: optionalString(body.status) === "paid" || optionalString(body.status) === "cancelled"
             ? optionalString(body.status) as "paid" | "cancelled"
             : "open",

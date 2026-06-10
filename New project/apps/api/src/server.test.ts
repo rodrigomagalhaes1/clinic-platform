@@ -165,6 +165,21 @@ describe("Patients", () => {
     expect((b1.total as number)).toBeGreaterThanOrEqual(3);
   });
 
+  it("GET /v1/patients?sortBy=fullName&sortOrder=asc sorts alphabetically", async () => {
+    await request(port, "POST", "/v1/patients", { fullName: "Sort Zelda" });
+    await request(port, "POST", "/v1/patients", { fullName: "Sort Alice" });
+
+    const { body } = await request(port, "GET", "/v1/patients?sortBy=fullName&sortOrder=asc&limit=500");
+    const list = (body as Record<string, unknown>).data as Record<string, unknown>[];
+    const names = list.map((p) => p.fullName as string).filter((n) => n.startsWith("Sort "));
+    expect(names).toEqual(["Sort Alice", "Sort Zelda"]);
+  });
+
+  it("GET /v1/patients with an unknown sortBy is ignored", async () => {
+    const { status } = await request(port, "GET", "/v1/patients?sortBy=notAField");
+    expect(status).toBe(200);
+  });
+
   it("GET /v1/patients/:id returns the patient", async () => {
     const create = await request(port, "POST", "/v1/patients", { fullName: "Carla Mendes" });
     const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
@@ -305,6 +320,26 @@ describe("Appointments", () => {
       endsAt: "2026-07-01T10:00:00Z"
     });
     expect(status).toBe(400);
+  });
+
+  it("GET /v1/appointments?sortBy=startsAt&sortOrder=asc sorts chronologically", async () => {
+    await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_sort",
+      professionalId: "pro_sort",
+      startsAt: "2029-05-02T10:00:00Z",
+      endsAt: "2029-05-02T10:30:00Z"
+    });
+    await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_sort",
+      professionalId: "pro_sort",
+      startsAt: "2029-05-01T10:00:00Z",
+      endsAt: "2029-05-01T10:30:00Z"
+    });
+
+    const { body } = await request(port, "GET", "/v1/appointments?professionalId=pro_sort&sortBy=startsAt&sortOrder=asc");
+    const list = (body as Record<string, unknown>).data as Record<string, unknown>[];
+    const starts = list.map((a) => a.startsAt as string);
+    expect(starts).toEqual(["2029-05-01T10:00:00.000Z", "2029-05-02T10:00:00.000Z"]);
   });
 
   it("POST /v1/appointments returns 409 when the professional already has an overlapping appointment", async () => {

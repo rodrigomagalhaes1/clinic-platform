@@ -307,6 +307,43 @@ describe("Appointments", () => {
     expect(status).toBe(400);
   });
 
+  it("POST /v1/appointments returns 409 when the professional already has an overlapping appointment", async () => {
+    await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_conflict_a",
+      professionalId: "pro_conflict",
+      startsAt: "2028-01-10T10:00:00Z",
+      endsAt: "2028-01-10T11:00:00Z"
+    });
+
+    const { status, body } = await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_conflict_b",
+      professionalId: "pro_conflict",
+      startsAt: "2028-01-10T10:30:00Z",
+      endsAt: "2028-01-10T11:30:00Z"
+    });
+
+    expect(status).toBe(409);
+    expect(((body as Record<string, unknown>).error as Record<string, unknown>).code).toBe("conflict");
+  });
+
+  it("POST /v1/appointments allows non-overlapping appointments for the same professional", async () => {
+    await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_noconflict_a",
+      professionalId: "pro_noconflict",
+      startsAt: "2028-02-10T10:00:00Z",
+      endsAt: "2028-02-10T11:00:00Z"
+    });
+
+    const { status } = await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_noconflict_b",
+      professionalId: "pro_noconflict",
+      startsAt: "2028-02-10T11:00:00Z",
+      endsAt: "2028-02-10T12:00:00Z"
+    });
+
+    expect(status).toBe(201);
+  });
+
   it("GET /v1/appointments/:id returns the appointment", async () => {
     const create = await request(port, "POST", "/v1/appointments", {
       patientId: "pat_getbyid",
@@ -375,6 +412,49 @@ describe("Appointments", () => {
       procedureName: "Qualquer"
     });
     expect(status).toBe(404);
+  });
+
+  it("PATCH /v1/appointments/:id returns 409 when moving into another appointment's time slot", async () => {
+    await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_patch_conflict_a",
+      professionalId: "pro_patch_conflict",
+      startsAt: "2028-03-10T09:00:00Z",
+      endsAt: "2028-03-10T09:30:00Z"
+    });
+    const create = await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_patch_conflict_b",
+      professionalId: "pro_patch_conflict",
+      startsAt: "2028-03-10T11:00:00Z",
+      endsAt: "2028-03-10T11:30:00Z"
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const { status, body } = await request(port, "PATCH", `/v1/appointments/${id}`, {
+      startsAt: "2028-03-10T09:00:00Z",
+      endsAt: "2028-03-10T09:30:00Z"
+    });
+
+    expect(status).toBe(409);
+    expect(((body as Record<string, unknown>).error as Record<string, unknown>).code).toBe("conflict");
+  });
+
+  it("PATCH /v1/appointments/:id allows updating its own time without triggering a self-conflict", async () => {
+    const create = await request(port, "POST", "/v1/appointments", {
+      patientId: "pat_patch_self",
+      professionalId: "pro_patch_self",
+      startsAt: "2028-04-10T09:00:00Z",
+      endsAt: "2028-04-10T09:30:00Z"
+    });
+    const id = ((create.body as Record<string, unknown>).data as Record<string, unknown>).id as string;
+
+    const { status, body } = await request(port, "PATCH", `/v1/appointments/${id}`, {
+      startsAt: "2028-04-10T09:15:00Z",
+      endsAt: "2028-04-10T09:45:00Z"
+    });
+
+    expect(status).toBe(200);
+    const appt = (body as Record<string, unknown>).data as Record<string, unknown>;
+    expect(appt.startsAt).toBe("2028-04-10T09:15:00.000Z");
   });
 });
 

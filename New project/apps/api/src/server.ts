@@ -21,6 +21,22 @@ function parsePositiveInt(value: unknown, fieldName: string): number {
   return n;
 }
 
+function findAppointmentConflict(
+  appointments: { id: string; professionalId: string; startsAt: Date | string; endsAt: Date | string; status: string }[],
+  professionalId: string,
+  startsAt: Date,
+  endsAt: Date,
+  excludeId?: string
+) {
+  return appointments.find((a) =>
+    a.id !== excludeId &&
+    a.professionalId === professionalId &&
+    a.status !== "cancelled" &&
+    new Date(a.startsAt).getTime() < endsAt.getTime() &&
+    new Date(a.endsAt).getTime() > startsAt.getTime()
+  );
+}
+
 function paginate<T>(items: T[], searchParams: URLSearchParams) {
   const limit = Math.min(Math.max(Number(searchParams.get("limit") ?? 100), 1), 500);
   const offset = Math.max(Number(searchParams.get("offset") ?? 0), 0);
@@ -153,12 +169,26 @@ export function createApp(store: AppStore = createSqliteStore()) {
         if (!appointment) return notFound(response);
 
         const body = await parseJsonBody(request);
+
+        const nextProfessionalId = typeof body.professionalId === "string" && body.professionalId.length > 0 ? body.professionalId : appointment.professionalId;
+        const nextStartsAt = typeof body.startsAt === "string" ? parseDate(body.startsAt, "startsAt") : new Date(appointment.startsAt);
+        const nextEndsAt = typeof body.endsAt === "string" ? parseDate(body.endsAt, "endsAt") : new Date(appointment.endsAt);
+
+        if (nextStartsAt >= nextEndsAt) {
+          return badRequest(response, "endsAt must be after startsAt");
+        }
+
+        const conflict = findAppointmentConflict(store.appointments.list(), nextProfessionalId, nextStartsAt, nextEndsAt, appointment.id);
+        if (conflict) {
+          return json(response, 409, { error: { code: "conflict", message: "Professional already has an appointment in this time range" } });
+        }
+
         const updated = store.appointments.create({
           ...appointment,
           patientId: typeof body.patientId === "string" && body.patientId.length > 0 ? body.patientId : appointment.patientId,
-          professionalId: typeof body.professionalId === "string" && body.professionalId.length > 0 ? body.professionalId : appointment.professionalId,
-          startsAt: typeof body.startsAt === "string" ? new Date(body.startsAt) : appointment.startsAt,
-          endsAt: typeof body.endsAt === "string" ? new Date(body.endsAt) : appointment.endsAt,
+          professionalId: nextProfessionalId,
+          startsAt: nextStartsAt,
+          endsAt: nextEndsAt,
           procedureName: "procedureName" in body ? (optionalString(body.procedureName) ?? appointment.procedureName) : appointment.procedureName,
           roomName: "roomName" in body ? (optionalString(body.roomName) ?? appointment.roomName) : appointment.roomName,
           insuranceName: "insuranceName" in body ? (optionalString(body.insuranceName) ?? appointment.insuranceName) : appointment.insuranceName,
@@ -217,6 +247,11 @@ export function createApp(store: AppStore = createSqliteStore()) {
         const endsAt = parseDate(body.endsAt, "endsAt");
         if (startsAt >= endsAt) {
           return badRequest(response, "endsAt must be after startsAt");
+        }
+
+        const conflict = findAppointmentConflict(store.appointments.list(), String(body.professionalId), startsAt, endsAt);
+        if (conflict) {
+          return json(response, 409, { error: { code: "conflict", message: "Professional already has an appointment in this time range" } });
         }
 
         const appointment = store.appointments.create({

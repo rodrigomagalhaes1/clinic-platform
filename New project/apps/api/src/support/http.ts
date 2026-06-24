@@ -59,11 +59,35 @@ export class BadRequestError extends Error {
   }
 }
 
-export async function parseJsonBody(request: IncomingMessage): Promise<JsonRecord> {
+export class PayloadTooLargeError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "PayloadTooLargeError";
+  }
+}
+
+export function payloadTooLarge(response: ServerResponse, message: string) {
+  return json(response, 413, {
+    error: {
+      code: "payload_too_large",
+      message
+    }
+  });
+}
+
+const MAX_BODY_BYTES = 1024 * 1024;
+
+export async function parseJsonBody(request: IncomingMessage, maxBytes = MAX_BODY_BYTES): Promise<JsonRecord> {
   const chunks: Buffer[] = [];
+  let totalBytes = 0;
 
   for await (const chunk of request) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    totalBytes += buffer.byteLength;
+    if (totalBytes > maxBytes) {
+      throw new PayloadTooLargeError(`Request body must not exceed ${maxBytes} bytes`);
+    }
+    chunks.push(buffer);
   }
 
   if (chunks.length === 0) {

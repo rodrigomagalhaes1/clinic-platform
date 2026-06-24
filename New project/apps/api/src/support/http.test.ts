@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { BadRequestError, parseJsonBody } from "./http.js";
+import { BadRequestError, PayloadTooLargeError, parseJsonBody } from "./http.js";
 import { IncomingMessage } from "node:http";
 import { Readable } from "node:stream";
 
@@ -89,5 +89,36 @@ describe("parseJsonBody", () => {
     // JSON.parse("[1,2,3]") returns an array, cast to JsonRecord is valid
     const result = await parseJsonBody(req);
     expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("throws PayloadTooLargeError when the body exceeds maxBytes", async () => {
+    const req = makeRequest(JSON.stringify({ note: "x".repeat(100) }));
+    await expect(parseJsonBody(req, 10)).rejects.toBeInstanceOf(PayloadTooLargeError);
+  });
+
+  it("accepts a body within a custom maxBytes limit", async () => {
+    const req = makeRequest(JSON.stringify({ a: 1 }));
+    const result = await parseJsonBody(req, 1024);
+    expect(result.a).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// PayloadTooLargeError
+// ---------------------------------------------------------------------------
+
+describe("PayloadTooLargeError", () => {
+  it("is an instance of Error", () => {
+    expect(new PayloadTooLargeError("too big")).toBeInstanceOf(Error);
+  });
+
+  it("has name PayloadTooLargeError", () => {
+    expect(new PayloadTooLargeError("too big").name).toBe("PayloadTooLargeError");
+  });
+
+  it("preserves the message", () => {
+    expect(new PayloadTooLargeError("Request body must not exceed 10 bytes").message).toBe(
+      "Request body must not exceed 10 bytes"
+    );
   });
 });
